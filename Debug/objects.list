@@ -1,3 +1,4 @@
+"./Core/Src/PID.o"
 "./Core/Src/adc.o"
 "./Core/Src/gpio.o"
 "./Core/Src/main.o"
