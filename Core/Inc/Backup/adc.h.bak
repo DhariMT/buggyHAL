@@ -41,7 +41,8 @@ extern ADC_HandleTypeDef hadc1;
 void MX_ADC1_Init(void);
 
 /* USER CODE BEGIN Prototypes */
-
+void ADC_Select_CH0(void);
+void ADC_Select_CH1(void);
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus

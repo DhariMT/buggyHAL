@@ -20,6 +20,7 @@
 #include "main.h"
 #include "adc.h"
 #include "tim.h"
+#include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -49,6 +50,8 @@ int32_t counter;
 
 uint16_t pulseRight = 3359;
 uint16_t pulseLeft = 3359;
+
+uint32_t PollingADC, PollingADC1;
 
 uint32_t ERROR_OCCURED = 0;
 /* USER CODE END PV */
@@ -100,21 +103,33 @@ int main(void)
   MX_TIM1_Init();
   MX_TIM2_Init();
   MX_ADC1_Init();
+  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 
+ HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4, 0);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, pulseLeft);
-	  __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, pulseRight);
-	  HAL_Delay(500);
+//	  __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, pulseLeft);
+//	  __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, pulseRight);
+//	  HAL_Delay(500);
+	 ADC_Select_CH0();
+	 HAL_ADC_Start(&hadc1);
+	 HAL_ADC_PollForConversion(&hadc1, 20);
+	 PollingADC = HAL_ADC_GetValue(&hadc1);
+
+	 ADC_Select_CH1();
+	 HAL_ADC_Start(&hadc1);
+	 HAL_ADC_PollForConversion(&hadc1, 20);
+	 PollingADC1 = HAL_ADC_GetValue(&hadc1);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
   }
+
   /* USER CODE END 3 */
 }
 
