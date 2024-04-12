@@ -1,0 +1,25 @@
+void setPWM1(float dutyCycle); // takes a float value between 0 and 1 and updates the duty cycle of the motor
+void setPWM2(float dutyCycle);
+
+float readEncoder1(void); // gets the encoder value as number of ticks/second;
+float readEncoder2(void); // gets the encoder value as number of ticks/second;
+
+float read_Sensor5(void); // takes a float value between 0 and 1 and updates the duty cycle of the motor
+float read_Sensor4(void);
+float read_Sensor3(void);
+float read_Sensor2(void);
+float read_Sensor1(void);
+
+void PID_Init(PID_TypeDef *uPID); // takes in a pointer to c data struct of type PID_TypeDef and initializes this struct
+
+void PID(PID_TypeDef *uPID, double *Input, double *Output, double *Setpoint, double Kp, double Ki, double Kd, PIDPON_TypeDef POn, PIDCD_TypeDef ControllerDirection); // Starts the controller with and initalizes tuning parameters;
+
+
+uint8_t PID_Compute(PID_TypeDef *uPID); // Computes the PID output
+
+
+void PID_SetOutputLimits(PID_TypeDef *uPID, double Min, double Max); // Sets the limit of the PID Compute output
+
+void PID_SetTunings(PID_TypeDef *uPID, double Kp, double Ki, double Kd); // Updates the tuning parameters
+
+void BLE_Interrupt(void); // this function is called upon the UART reading of the BLE module

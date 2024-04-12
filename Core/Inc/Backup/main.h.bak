@@ -61,8 +61,10 @@ void Error_Handler(void);
 #define Encoder_CH1_GPIO_Port GPIOA
 #define Encoder_CH2_Pin GPIO_PIN_1
 #define Encoder_CH2_GPIO_Port GPIOA
-#define Motors_Enable_Pin GPIO_PIN_4
-#define Motors_Enable_GPIO_Port GPIOC
+#define BLE_TX_Pin GPIO_PIN_2
+#define BLE_TX_GPIO_Port GPIOA
+#define BLE_RX_Pin GPIO_PIN_3
+#define BLE_RX_GPIO_Port GPIOA
 #define Direction_Pin_1_Pin GPIO_PIN_2
 #define Direction_Pin_1_GPIO_Port GPIOB
 #define Bipolar_Pin_1_Pin GPIO_PIN_12
@@ -71,6 +73,14 @@ void Error_Handler(void);
 #define Bipolar_Pin_2_GPIO_Port GPIOB
 #define Direction_Pin_2_Pin GPIO_PIN_14
 #define Direction_Pin_2_GPIO_Port GPIOB
+#define Darl_3_Pin GPIO_PIN_6
+#define Darl_3_GPIO_Port GPIOC
+#define Darl_2_Pin GPIO_PIN_7
+#define Darl_2_GPIO_Port GPIOC
+#define Darl_1_Pin GPIO_PIN_8
+#define Darl_1_GPIO_Port GPIOC
+#define Motors_Enable_Pin GPIO_PIN_9
+#define Motors_Enable_GPIO_Port GPIOC
 #define PWM_2_Pin GPIO_PIN_9
 #define PWM_2_GPIO_Port GPIOA
 #define PWM__1_Pin GPIO_PIN_10
@@ -79,6 +89,10 @@ void Error_Handler(void);
 #define Encoder2_CH1_GPIO_Port GPIOA
 #define Encoder2_CH2_Pin GPIO_PIN_3
 #define Encoder2_CH2_GPIO_Port GPIOB
+#define Darl_4_Pin GPIO_PIN_8
+#define Darl_4_GPIO_Port GPIOB
+#define Darl_5_Pin GPIO_PIN_9
+#define Darl_5_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 
