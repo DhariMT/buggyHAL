@@ -26,7 +26,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "Encoder.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -52,7 +52,7 @@ int32_t counter;
 uint16_t pulseRight = 3359;
 uint16_t pulseLeft = 3359;
 
-uint16_t ReadingADC[5], val1, val2;
+uint16_t ReadingADC[5];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -64,56 +64,6 @@ void SystemClock_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-//void ADC_Select_Sensor5(void) {
-//ADC_ChannelConfTypeDef sConfig = {0};
-//sConfig.Channel = ADC_CHANNEL_15;
-//sConfig.Rank = 1;
-//sConfig.SamplingTime = ADC_SAMPLETIME_15CYCLES;
-//if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-//{
-//  Error_Handler();
-//}
-//}
-//void ADC_Select_Sensor4(void) {
-//ADC_ChannelConfTypeDef sConfig = {0};
-//sConfig.Channel = ADC_CHANNEL_14;
-//sConfig.Rank = 1;
-//sConfig.SamplingTime = ADC_SAMPLETIME_15CYCLES;
-//if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-//{
-//  Error_Handler();
-//}
-//}
-//void ADC_Select_Sensor3(void) {
-//ADC_ChannelConfTypeDef sConfig = {0};
-//sConfig.Channel = ADC_CHANNEL_13;
-//sConfig.Rank = 1;
-//sConfig.SamplingTime = ADC_SAMPLETIME_15CYCLES;
-//if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-//{
-//  Error_Handler();
-//}
-//}
-//void ADC_Select_Sensor2(void) {
-//ADC_ChannelConfTypeDef sConfig = {0};
-//sConfig.Channel = ADC_CHANNEL_12;
-//sConfig.Rank = 1;
-//sConfig.SamplingTime = ADC_SAMPLETIME_15CYCLES;
-//if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-//{
-//  Error_Handler();
-//}
-//}
-//void ADC_Select_Sensor1(void) {
-//ADC_ChannelConfTypeDef sConfig = {0};
-//sConfig.Channel = ADC_CHANNEL_11;
-//sConfig.Rank = 1;
-//sConfig.SamplingTime = ADC_SAMPLETIME_15CYCLES;
-//if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-//{
-//  Error_Handler();
-//}
-//}
 
 /* USER CODE END 0 */
 
@@ -153,10 +103,23 @@ int main(void)
   MX_ADC1_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
+
  resetEncoder(&leftWheel);
  resetEncoder(&rightWheel);
- HAL_GPIO_WritePin(GPIOC, GPIO_PIN_9, 0);
+
+ HAL_GPIO_WritePin(GPIOC, GPIO_PIN_9, 1);
+ HAL_GPIO_WritePin(Direction1_GPIO_Port, Direction1_Pin, 1); // left wheel
+ HAL_GPIO_WritePin(Direction2_GPIO_Port, Direction2_Pin, 1); // right
+
  HAL_ADC_Start_DMA(&hadc1, ReadingADC, 5);
+//
+// speedSetpoint = 500;
+//
+// PID(&TPID, &Temp, &PIDOut, &TempSetpoint, 2, 5, 1, _PID_P_ON_E, _PID_CD_DIRECT);
+//
+// PID_SetMode(&TPID, _PID_MODE_AUTOMATIC);
+// PID_SetSampleTime(&TPID, 500);
+// PID_SetOutputLimits(&TPID, -100, 100);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -166,32 +129,7 @@ int main(void)
 	  __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, pulseLeft);
 	  __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, pulseRight);
 
-
 	  HAL_Delay(100);
-//	 ADC_Select_Sensor5();
-//	 HAL_ADC_Start(&hadc1);
-//	 HAL_ADC_PollForConversion(&hadc1, 1000);
-//	 PollingADC = HAL_ADC_GetValue(&hadc1);
-//
-//	 ADC_Select_Sensor4();
-//	 HAL_ADC_Start(&hadc1);
-//	 HAL_ADC_PollForConversion(&hadc1, 1000);
-//	 PollingADC1 = HAL_ADC_GetValue(&hadc1);
-//
-//	 ADC_Select_Sensor3();
-//	 HAL_ADC_Start(&hadc1);
-//	 HAL_ADC_PollForConversion(&hadc1, 1000);
-//	 PollingADC2 = HAL_ADC_GetValue(&hadc1);
-//
-//	 ADC_Select_Sensor2();
-//	 HAL_ADC_Start(&hadc1);
-//	 HAL_ADC_PollForConversion(&hadc1, 1000);
-//	 PollingADC3 = HAL_ADC_GetValue(&hadc1);
-//
-//	 ADC_Select_Sensor1();
-//	 HAL_ADC_Start(&hadc1);
-//	 HAL_ADC_PollForConversion(&hadc1, 1000);
-//	 PollingADC4 = HAL_ADC_GetValue(&hadc1);
 
 
 
@@ -252,8 +190,7 @@ void SystemClock_Config(void)
 /* USER CODE BEGIN 4 */
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc) {
 // empty for now
-	val1 = ReadingADC[0];
-	val2 = ReadingADC[1];
+
 }
 /* USER CODE END 4 */
 

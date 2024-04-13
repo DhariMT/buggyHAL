@@ -22,7 +22,7 @@
 #include "stm32f4xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "tim.h"
+#include "Encoder.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -59,7 +59,7 @@ extern DMA_HandleTypeDef hdma_adc1;
 extern TIM_HandleTypeDef htim2;
 extern TIM_HandleTypeDef htim5;
 /* USER CODE BEGIN EV */
-extern encoder_instance rightWheel, leftWheel;
+
 /* USER CODE END EV */
 
 /******************************************************************************/
@@ -186,8 +186,8 @@ void SysTick_Handler(void)
 {
   /* USER CODE BEGIN SysTick_IRQn 0 */
   if (HAL_GetTick() % 100 == 0) {
-	  readEncoder(&leftWheel, 10);
-	  readEncoder(&rightWheel, 10);
+	  updateEncoder(&leftWheel, &htim2, 100);
+	  updateEncoder(&rightWheel,&htim5, 100);
   }
   /* USER CODE END SysTick_IRQn 0 */
   HAL_IncTick();

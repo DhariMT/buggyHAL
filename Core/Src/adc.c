@@ -131,8 +131,8 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* adcHandle)
     PC4     ------> ADC1_IN14
     PC5     ------> ADC1_IN15
     */
-    GPIO_InitStruct.Pin = GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3|GPIO_PIN_4
-                          |GPIO_PIN_5;
+    GPIO_InitStruct.Pin = Sensor1_Pin|Sensor2_Pin|Sensor3_Pin|Sensor4_Pin
+                          |Sensor5_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
@@ -180,8 +180,8 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* adcHandle)
     PC4     ------> ADC1_IN14
     PC5     ------> ADC1_IN15
     */
-    HAL_GPIO_DeInit(GPIOC, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3|GPIO_PIN_4
-                          |GPIO_PIN_5);
+    HAL_GPIO_DeInit(GPIOC, Sensor1_Pin|Sensor2_Pin|Sensor3_Pin|Sensor4_Pin
+                          |Sensor5_Pin);
 
     /* ADC1 DMA DeInit */
     HAL_DMA_DeInit(adcHandle->DMA_Handle);

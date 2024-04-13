@@ -1,3 +1,4 @@
+"./Core/Src/Encoder.o"
 "./Core/Src/PID.o"
 "./Core/Src/adc.o"
 "./Core/Src/dma.o"

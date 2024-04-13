@@ -22,7 +22,7 @@
 
 /* USER CODE BEGIN 0 */
 
-encoder_instance rightWheel, leftWheel;
+
 /* USER CODE END 0 */
 
 TIM_HandleTypeDef htim1;
@@ -282,7 +282,7 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef* timHandle)
     PA9     ------> TIM1_CH2
     PA10     ------> TIM1_CH3
     */
-    GPIO_InitStruct.Pin = PWM_2_Pin|PWM__1_Pin;
+    GPIO_InitStruct.Pin = PWM2_Pin|PWM1_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_PULLDOWN;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -360,32 +360,8 @@ void HAL_TIM_Encoder_MspDeInit(TIM_HandleTypeDef* tim_encoderHandle)
 }
 
 /* USER CODE BEGIN 1 */
-void HAL_TIM_PeriodElapsedCallBack(TIM_HandleTypeDef *htim) {
-
-	if (htim->Instance == TIM2) {
-		leftWheel.position = __HAL_TIM_GET_COUNTER(htim);
-		//leftWheel.velocity = (leftWheel.position - leftWheel.last_position)*sampleRate; // in Hz
-		//leftWheel.last_position = leftWheel.position;		leftWheel.position = __HAL_TIM_GET_COUNTER(htim);
-	}
-
-	else if (htim->Instance == TIM5) {
-		rightWheel.position = __HAL_TIM_GET_COUNTER(htim);
-		//rightWheel->velocity = (rightWheel->position - rightWheel->last_position)*sampleRate; // in Hz
-		//rightWheel->last_position = rightWheel->position;
-	}
 
 
-}
-void resetEncoder(encoder_instance* wheel_encoder) {
-	wheel_encoder->position = 0;
-	wheel_encoder->velocity = 0;
-	wheel_encoder->last_position = 0;
-}
-
-void readEncoder(encoder_instance* wheel_encoder,const uint16_t sampleRate) {
-	wheel_encoder->velocity = (wheel_encoder->position - wheel_encoder->last_position)*sampleRate; // in Hz
-	wheel_encoder->last_position = wheel_encoder->position;
-}
 
 
 /* USER CODE END 1 */

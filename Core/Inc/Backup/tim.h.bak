@@ -39,12 +39,7 @@ extern TIM_HandleTypeDef htim2;
 extern TIM_HandleTypeDef htim5;
 
 /* USER CODE BEGIN Private defines */
-typedef struct {
-	int32_t position;
-	int16_t velocity;
-	int32_t last_position;
-} encoder_instance;
-extern encoder_instance rightWheel, leftWheel;
+
 /* USER CODE END Private defines */
 
 void MX_TIM1_Init(void);
@@ -54,9 +49,7 @@ void MX_TIM5_Init(void);
 void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 
 /* USER CODE BEGIN Prototypes */
-void HAL_TIM_PeriodElapsedCallBack(TIM_HandleTypeDef *htim);
-void resetEncoder(encoder_instance* wheel_encoder);
-void readEncoder(encoder_instance* wheel_encoder,const uint16_t sampleRate);
+
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus

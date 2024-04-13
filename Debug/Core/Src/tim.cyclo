@@ -6,6 +6,3 @@
 ../Core/Src/tim.c:270:6:HAL_TIM_MspPostInit	2
 ../Core/Src/tim.c:299:6:HAL_TIM_PWM_MspDeInit	2
 ../Core/Src/tim.c:315:6:HAL_TIM_Encoder_MspDeInit	3
-../Core/Src/tim.c:363:6:HAL_TIM_PeriodElapsedCallBack	3
-../Core/Src/tim.c:379:6:resetEncoder	1
-../Core/Src/tim.c:385:6:readEncoder	1
