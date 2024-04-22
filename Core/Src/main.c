@@ -26,7 +26,12 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "Motors.h"
 #include "Encoder.h"
+#include "PID.h"
+#include "StateMachine.h"
+
+uint8_t MODE;
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -47,12 +52,19 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-int32_t counter;
 
-uint16_t pulseRight = 3359;
-uint16_t pulseLeft = 3359;
 
-uint16_t ReadingADC[5];
+//uint16_t ReadingADC[5];
+
+
+//PID_TypeDef PID_Speed;
+
+//motor_instance leftMotor, rightMotor;
+
+// Flags for state machine
+
+
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -65,6 +77,8 @@ void SystemClock_Config(void);
 /* USER CODE BEGIN 0 */
 
 
+
+
 /* USER CODE END 0 */
 
 /**
@@ -74,7 +88,12 @@ void SystemClock_Config(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
+	states Current_State = RESET;
 
+	//motor_instance leftMotor, rightMotor;
+
+
+	//uint8_t buffer[27] = "Welcome to BinaryUpdates!\r\n";
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -85,11 +104,11 @@ int main(void)
   /* USER CODE BEGIN Init */
 
 
+
   /* USER CODE END Init */
 
   /* Configure the system clock */
   SystemClock_Config();
-
   /* USER CODE BEGIN SysInit */
 
   /* USER CODE END SysInit */
@@ -102,39 +121,17 @@ int main(void)
   MX_TIM2_Init();
   MX_ADC1_Init();
   MX_USART2_UART_Init();
+  MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
 
- resetEncoder(&leftWheel);
- resetEncoder(&rightWheel);
-
- HAL_GPIO_WritePin(GPIOC, GPIO_PIN_9, 1);
- HAL_GPIO_WritePin(Direction1_GPIO_Port, Direction1_Pin, 1); // left wheel
- HAL_GPIO_WritePin(Direction2_GPIO_Port, Direction2_Pin, 1); // right
-
- HAL_ADC_Start_DMA(&hadc1, ReadingADC, 5);
-//
-// speedSetpoint = 500;
-//
-// PID(&TPID, &Temp, &PIDOut, &TempSetpoint, 2, 5, 1, _PID_P_ON_E, _PID_CD_DIRECT);
-//
-// PID_SetMode(&TPID, _PID_MODE_AUTOMATIC);
-// PID_SetSampleTime(&TPID, 500);
-// PID_SetOutputLimits(&TPID, -100, 100);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, pulseLeft);
-	  __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, pulseRight);
-
-	  HAL_Delay(100);
-
-
-
     /* USER CODE END WHILE */
-
+	  Current_State = StateMachine(Current_State);
     /* USER CODE BEGIN 3 */
   }
 
@@ -188,10 +185,10 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc) {
-// empty for now
-
-}
+//void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc) {
+//// empty for now
+//
+//}
 /* USER CODE END 4 */
 
 /**

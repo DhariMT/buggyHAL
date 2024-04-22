@@ -57,6 +57,9 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define Button_Pin GPIO_PIN_13
+#define Button_GPIO_Port GPIOC
+#define Button_EXTI_IRQn EXTI15_10_IRQn
 #define Sensor1_Pin GPIO_PIN_1
 #define Sensor1_GPIO_Port GPIOC
 #define Sensor2_Pin GPIO_PIN_2
@@ -71,18 +74,20 @@ void Error_Handler(void);
 #define BLE_TX_GPIO_Port GPIOA
 #define BLE_RX_Pin GPIO_PIN_3
 #define BLE_RX_GPIO_Port GPIOA
+#define LD2_Pin GPIO_PIN_5
+#define LD2_GPIO_Port GPIOA
 #define Sensor4_Pin GPIO_PIN_4
 #define Sensor4_GPIO_Port GPIOC
 #define Sensor5_Pin GPIO_PIN_5
 #define Sensor5_GPIO_Port GPIOC
-#define Direction1_Pin GPIO_PIN_2
-#define Direction1_GPIO_Port GPIOB
-#define Bipolar1_Pin GPIO_PIN_12
-#define Bipolar1_GPIO_Port GPIOB
-#define Bipolar2_Pin GPIO_PIN_13
-#define Bipolar2_GPIO_Port GPIOB
-#define Direction2_Pin GPIO_PIN_14
-#define Direction2_GPIO_Port GPIOB
+#define directionLeft_Pin GPIO_PIN_2
+#define directionLeft_GPIO_Port GPIOB
+#define unipolarLeft_Pin GPIO_PIN_12
+#define unipolarLeft_GPIO_Port GPIOB
+#define unipolarRight_Pin GPIO_PIN_13
+#define unipolarRight_GPIO_Port GPIOB
+#define directionRight_Pin GPIO_PIN_14
+#define directionRight_GPIO_Port GPIOB
 #define Darl3_Pin GPIO_PIN_6
 #define Darl3_GPIO_Port GPIOC
 #define Darl2_Pin GPIO_PIN_7
@@ -105,7 +110,10 @@ void Error_Handler(void);
 #define Darl5_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
-
+#define BUFFER_SIZE_BLE 8
+#define TIME_OUT_BLE 10
+#define true 1
+#define false 0
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

@@ -1,6 +1,5 @@
-../Core/Src/main.c:64:6:resetEncoder	1
-../Core/Src/main.c:70:6:readEncoder	1
-../Core/Src/main.c:75:6:HAL_TIM_PeriodElapsedCallBack	3
-../Core/Src/main.c:200:6:Error_Handler	1
-../Core/Src/main.c:150:6:SystemClock_Config	2
-../Core/Src/main.c:99:5:main	1
+../Core/Src/main.c:79:6:HAL_GPIO_EXTI_Callback	2
+../Core/Src/main.c:180:6:SystemClock_Config	3
+../Core/Src/main.c:95:5:main	1
+../Core/Src/main.c:223:6:HAL_ADC_ConvCpltCallback	1
+../Core/Src/main.c:233:6:Error_Handler	1

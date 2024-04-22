@@ -1,0 +1,2 @@
+../Core/Src/Encoder.c:12:6:resetEncoder	12	static
+../Core/Src/Encoder.c:18:6:updateEncoder	16	static

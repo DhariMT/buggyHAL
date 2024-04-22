@@ -1,0 +1,190 @@
+#include "StateMachine.h"
+#include "main.h"
+#include "tim.h"
+#include "Motors.h"
+#include "PID.h"
+#include "Encoder.h"
+
+#define MAX_PWM 3000
+#define SAMPLE_TIME 1 //milliseconds
+/*
+ * flags are of type uint8_t
+ * List of all flags is:
+ *
+ *
+ */
+
+uint8_t button_pushed = false;
+
+
+
+double Kp, Ki, Kd;
+
+int16_t LEFT, RIGHT, outputMax, outputMin, IntegralMin, IntegralMax;
+
+PIDController PID_Speed;
+
+voidFunc UponEnter[S_NUM] =          {State_Enter_IDLE,   State_Enter_CONSTANT_SPEED};
+voidFunc ActionWhileInState[S_NUM] = {State_InState_IDLE, State_InState_CONSTANT_SPEED};
+voidFunc UponExit[S_NUM] =           {State_Exit_IDLE,    State_Exit_CONSTANT_SPEED};
+
+
+
+
+
+states StateMachine(states Current_State)
+{
+    states Next_State = Current_State;
+
+    switch ( Current_State )
+    {
+    case IDLE:
+    	/* State IDLE START */
+
+    	if (button_pushed) {
+    		Next_State = CONSTANT_SPEED;
+    	}
+
+    	/* State IDLE END */
+           break;
+    case CONSTANT_SPEED:
+
+    	/* State SPIN_TIRES START */
+
+    	if (button_pushed) {
+    		Next_State = IDLE;
+    	}
+
+    	/* State SPIN_TIRES END */
+           break;
+           // The program should never arrive here
+       default:
+           break;
+
+    }
+
+    if (Next_State != Current_State)
+    {
+        // Function call for Upon Exit function, it can be omitted but allows extra functionality
+        UponExit[Current_State]();
+        // Function call for Upon Enter function, it can be omitted but allows extra functionality
+        UponEnter[Next_State]();
+    }
+    else // ActionWhileInState is only be called when NOT doing a transition
+     {
+        ActionWhileInState[Current_State]();
+    }
+    return Next_State;
+}
+
+
+
+
+
+
+
+void State_Enter_IDLE(void)
+{
+	outputMax = MAX_PWM;
+	outputMin = 0;
+	IntegralMin = 0;
+	IntegralMax = MAX_PWM;
+	Kp = 0;
+	Ki = 0;
+	Kd = 0;
+
+
+	LEFT = 0;
+	RIGHT = 0;
+
+	button_pushed = false;
+	MOTORS_Disable();
+	MOTORS_Reset();
+}
+
+void State_Enter_CONSTANT_SPEED(void)
+
+{
+
+
+	button_pushed = false;
+
+	PIDController_Init(&PID_Speed, SAMPLE_TIME);
+	HAL_GPIO_WritePin(GPIOA, LD2_Pin, 1);
+
+
+	PIDController_SetLimits(&PID_Speed, outputMax, outputMin, IntegralMin, IntegralMax);
+	MOTOR_RIGHT_SetPWM(0);
+	MOTOR_LEFT_SetPWM(0);
+	MOTORS_Enable();
+
+
+}
+
+
+
+
+
+void State_InState_IDLE(void)
+{
+	button_pushed = button_pushed;
+}
+
+void State_InState_CONSTANT_SPEED(void) {
+
+//	 uint16_t currentTime;
+//	 uint16_t timeChange;
+//
+//	 currentTime = HAL_GetTick();
+//	 timeChange = currentTime - PID_Speed.lastTime;
+//	 if ( timeChange >= 100 ) {
+//		PID_Speed.Kp = Kp;
+//		PID_Speed.Ki = Ki;
+//		PID_Speed.Kd = Kd;
+//	    //int32_t PID_Out;
+//	    PIDController_Update(&PID_Speed, 500, myFilterLeft.filteredVelocity);
+////	 MOTOR_LEFT_SetPWM(PID_Out);
+//
+//	 }
+
+	//MOTOR_LEFT_SetPWM(LEFT);
+	PIDController_SetGain(&PID_Speed, Kp, Ki, Kd);
+
+}
+
+
+
+
+void State_Exit_IDLE(void)
+{
+
+}
+
+void State_Exit_CONSTANT_SPEED(void)
+{
+	//HAL_TIM_Base_Stop_IT(&htim3);
+	HAL_GPIO_WritePin(GPIOA, LD2_Pin, 0);
+}
+
+////////////////////////
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+
+	if (GPIO_Pin == Button_Pin) {
+		button_pushed = true;
+	}
+
+}
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim)
+{
+
+
+	  updateEncoder(SAMPLE_TIME);
+	  computeFilter(&myFilterLeft, leftWheel.velocity);
+
+	  PIDController_Update(&PID_Speed, LEFT, myFilterLeft.filteredVelocity);
+	  MOTOR_LEFT_SetPWM(PID_Speed.out);
+}
+
