@@ -20,11 +20,11 @@ voidFunc  UponExit[S_NUM] =           {State_Exit_RESET,  State_Exit_IDLE, State
 
 states button_pushed;
 
-double Kp, Ki, Kd;
+double KpLeft, KiLeft, KdLeft, KpRight, KiRight, KdRight;
 
 int16_t LEFT, RIGHT, IntegralMax, IntegralMin, outputMin, outputMax;
 
-PIDController PID_Speed;
+PIDController PIDleft_Speed, PIDright_Speed;
 
 
 
@@ -87,25 +87,7 @@ states StateMachine(states Current_State)
 
 void State_Enter_RESET() {
 
-	resetEncoder();
-	resetFilter();
 
-	PIDController_SetLimits(0, 0, 0, 0, 0);
-
-
-	Kp = 0;
-	Ki = 0;
-	Kd = 0;
-
-
-	LEFT = 0;
-	RIGHT = 0;
-
-
-	MOTORS_Reset();
-	MOTORS_Disable();
-
-	HAL_Delay(1);
 
 }
 
@@ -137,7 +119,7 @@ void State_Enter_CONSTANT_SPEED(void)
 
 {
 	button_pushed = false;
-	MOTORS_Disable();
+	//MOTORS_Disable();
 
 //	button_pushed = false;
 //
@@ -161,14 +143,23 @@ void State_InState_IDLE(void)
 void State_InState_TUNE(void)
 {
 
-	if (Kp != PID_Speed.Kp || Ki != PID_Speed.Ki || Kd != PID_Speed.Kd) {
+	if (KpLeft != PIDleft_Speed.Kp || KiLeft != PIDleft_Speed.Ki || KdLeft != PIDleft_Speed.Kd) {
 
 		HAL_TIM_Base_Stop_IT(&htim3);
 
-		PIDController_Init(&PID_Speed, SAMPLE_TIME);
-		PIDController_SetGain(&PID_Speed, Kp, Ki, Kd);
+		//PIDController_Init(&PID_Speed, SAMPLE_TIME);
+		PIDController_SetGain(&PIDleft_Speed, KpLeft, KiLeft, KdLeft);
+		HAL_TIM_Base_Start_IT(&htim3);
  }
-	HAL_TIM_Base_Start_IT(&htim3);
+
+	if (KpRight != PIDright_Speed.Kp || KiRight != PIDright_Speed.Ki || KdRight != PIDright_Speed.Kd) {
+
+		HAL_TIM_Base_Stop_IT(&htim3);
+
+		//PIDController_Init(&PID_Speed, SAMPLE_TIME);
+		PIDController_SetGain(&PIDright_Speed, KpRight, KiRight, KdRight);
+		HAL_TIM_Base_Start_IT(&htim3);
+ }
 
 }
 
@@ -203,11 +194,38 @@ void State_InState_CONSTANT_SPEED(void) {
 void State_Exit_RESET(void)
 {
 	//HAL_Delay(1);
+	resetEncoder();
+	resetFilter();
+
+
+	PIDController_Init(&PIDleft_Speed, SAMPLE_TIME);
+	PIDController_SetLimits(&PIDleft_Speed,MAX_PWM , 0, MAX_PWM, 0);
+
+	PIDController_Init(&PIDright_Speed, SAMPLE_TIME);
+	PIDController_SetLimits(&PIDright_Speed,MAX_PWM , 0, MAX_PWM, 0);
+
+	KpLeft = 0;
+	KiLeft = 0;
+	KdLeft = 0;
+
+	KpRight = 0;
+	KiRight = 0;
+	KdRight = 0;
+
+	LEFT = 0;
+	RIGHT = 0;
+
+
+	MOTORS_Reset();
+	//MOTORS_Disable();
+
+	HAL_Delay(1);
 }
 
 void State_Exit_IDLE(void)
 {
-	MOTORS_Reset();
+	MOTORS_Enable();
+	//MOTORS_Reset();
 	//HAL_Delay(1);
 	//MOTORS_Enable();
 }
@@ -240,14 +258,23 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 //	}
 }
 
-int16_t outputVel;
+
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim)
 {
 
-
+	  int16_t outputLeft, outputRight;
 	  updateEncoder(SAMPLE_TIME);
+
 	  computeFilter(&myFilterLeft, leftWheel.velocity);
-	  outputVel = PIDController_Update(&PID_Speed, LEFT, myFilterLeft.filteredVelocity);
-	  MOTOR_LEFT_SetPWM(outputVel);
+	  outputLeft = PIDController_Update(&PIDleft_Speed, LEFT, myFilterLeft.filteredVelocity);
+	  MOTOR_LEFT_SetPWM(outputLeft);
+
+	  computeFilter(&myFilterRight, rightWheel.velocity);
+	  outputRight = PIDController_Update(&PIDright_Speed, RIGHT, myFilterRight.filteredVelocity);
+	  MOTOR_RIGHT_SetPWM(outputRight);
+
+
+
+
 }

@@ -52,7 +52,7 @@ int16_t PIDController_Update(PIDController *pid, int16_t setpoint, int16_t input
 	/*
 	* Proportional
 	*/
-    float proportional = pid->Kp * error;
+    double proportional = pid->Kp * error;
 
 
 	/*
@@ -85,7 +85,7 @@ int16_t PIDController_Update(PIDController *pid, int16_t setpoint, int16_t input
 	/*
 	* Compute output and apply limits
 	*/
-    pid->out = (int32_t)(proportional + pid->integrator + pid->differentiator);
+    pid->out = (int16_t)(proportional + pid->integrator + pid->differentiator);
 
     if (pid->out > pid->limMax) {
 

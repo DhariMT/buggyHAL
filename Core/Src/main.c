@@ -86,7 +86,7 @@ void SystemClock_Config(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	states Current_State = RESET;
+	states Current_State = RESET_StateMachine;
 
 	//motor_instance leftMotor, rightMotor;
 
@@ -122,6 +122,8 @@ int main(void)
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
   //HAL_ADC_Start_DMA(&hadc1,ReadingADC, 5);
+  MOTORS_Reset();
+  MOTORS_Enable();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -130,7 +132,7 @@ int main(void)
   {
     /* USER CODE END WHILE */
 	  Current_State = StateMachine(Current_State);
-
+	 // MOTOR_LEFT_SetPWM(500);
     /* USER CODE BEGIN 3 */
   }
 
