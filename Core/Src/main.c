@@ -31,7 +31,6 @@
 #include "PID.h"
 #include "StateMachine.h"
 
-uint8_t MODE;
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -54,10 +53,9 @@ uint8_t MODE;
 /* USER CODE BEGIN PV */
 
 
-//uint16_t ReadingADC[5];
+uint16_t ReadingADC[5];
 
 
-//PID_TypeDef PID_Speed;
 
 //motor_instance leftMotor, rightMotor;
 
@@ -123,7 +121,7 @@ int main(void)
   MX_USART2_UART_Init();
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
-
+  //HAL_ADC_Start_DMA(&hadc1,ReadingADC, 5);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -132,6 +130,7 @@ int main(void)
   {
     /* USER CODE END WHILE */
 	  Current_State = StateMachine(Current_State);
+
     /* USER CODE BEGIN 3 */
   }
 
