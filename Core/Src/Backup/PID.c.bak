@@ -13,13 +13,13 @@ void PIDController_Init(PIDController *pid, uint8_t samplingPeriod_ms) {
 
 	pid->out = 0.0;
 
-	pid->limMax = 0;
-	pid->limMin = 0;
-	pid->limMinInt = 0;
-	pid->limMaxInt = 0;
+//	pid->limMax = 0;
+//	pid->limMin = 0;
+//	pid->limMinInt = 0;
+//	pid->limMaxInt = 0;
 
 	pid->lastTime = HAL_GetTick();
-	pid->T = samplingPeriod_ms / 100;
+	pid->T = samplingPeriod_ms / 1000;
 }
 
 void  PIDController_SetGain(PIDController *pid, double Kp, double Ki, double Kd) {
@@ -32,7 +32,7 @@ void  PIDController_SetGain(PIDController *pid, double Kp, double Ki, double Kd)
 }
 
 
-void  PIDController_SetLimits(PIDController *pid, int16_t outputMax, int16_t outputMin, int16_t IntegralMin, int16_t IntegralMax){
+void  PIDController_SetLimits(PIDController *pid, int16_t outputMax, int16_t outputMin, int16_t IntegralMax , int16_t IntegralMin){
 
 	pid->limMin = outputMin;
 	pid->limMax = outputMax;
@@ -41,7 +41,7 @@ void  PIDController_SetLimits(PIDController *pid, int16_t outputMax, int16_t out
 	pid->limMinInt= IntegralMin;
 }
 
-void PIDController_Update(PIDController *pid, int16_t setpoint, int16_t input) {
+int16_t PIDController_Update(PIDController *pid, int16_t setpoint, int16_t input) {
 
 	/*
 	* Error signal
@@ -102,5 +102,5 @@ void PIDController_Update(PIDController *pid, int16_t setpoint, int16_t input) {
     pid->prevInput = input;
 
     pid->lastTime = HAL_GetTick();
-
+    return pid->out;
 }

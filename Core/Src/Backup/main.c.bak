@@ -30,6 +30,8 @@
 #include "Encoder.h"
 #include "PID.h"
 #include "StateMachine.h"
+
+uint8_t MODE;
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -86,12 +88,9 @@ void SystemClock_Config(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	states Current_State = IDLE;
+	states Current_State = RESET;
 
 	//motor_instance leftMotor, rightMotor;
-
-	resetEncoder();
-	resetFilter();
 
 
 	//uint8_t buffer[27] = "Welcome to BinaryUpdates!\r\n";
@@ -110,7 +109,6 @@ int main(void)
 
   /* Configure the system clock */
   SystemClock_Config();
-
   /* USER CODE BEGIN SysInit */
 
   /* USER CODE END SysInit */

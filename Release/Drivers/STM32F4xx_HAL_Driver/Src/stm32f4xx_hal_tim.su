@@ -81,7 +81,7 @@
 ../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c:2628:19:HAL_TIM_OnePulse_Init	16	static
 ../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c:3019:19:HAL_TIM_Encoder_Init	24	static
 ../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c:6908:6:TIM_OC2_SetConfig	16	static
-../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c:4041:19:HAL_TIM_OC_ConfigChannel	16	static
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c:4041:19:HAL_TIM_OC_ConfigChannel	8	static
 ../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c:4219:19:HAL_TIM_PWM_ConfigChannel	16	static
 ../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c:7254:6:TIM_TI1_SetConfig	16	static
 ../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c:4120:19:HAL_TIM_IC_ConfigChannel	24	static

@@ -87,6 +87,7 @@ void SystemClock_Config(void);
   */
 int main(void)
 {
+
   /* USER CODE BEGIN 1 */
 	states Current_State = RESET;
 
@@ -109,6 +110,7 @@ int main(void)
 
   /* Configure the system clock */
   SystemClock_Config();
+
   /* USER CODE BEGIN SysInit */
 
   /* USER CODE END SysInit */
@@ -131,8 +133,9 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-	  Current_State = StateMachine(Current_State);
+
     /* USER CODE BEGIN 3 */
+	  Current_State = StateMachine(Current_State);
   }
 
   /* USER CODE END 3 */

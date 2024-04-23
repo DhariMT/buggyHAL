@@ -50,15 +50,15 @@ states StateMachine(states Current_State)
            break;
     case TUNE:
     	if (button_pushed) {
-    		Next_State = CONSTANT_SPEED;
-    	}
-    	break;
-
-    case CONSTANT_SPEED:
-    	if (button_pushed) {
     		Next_State = IDLE;
     	}
     	break;
+//
+//    case CONSTANT_SPEED:
+//    	if (button_pushed) {
+//    		Next_State = IDLE;
+//    	}
+//    	break;
     	/* State SPIN_TIRES START */
 
            // The program should never arrive here
@@ -112,15 +112,14 @@ void State_Enter_IDLE(void)
 {
 	button_pushed = false;
 	MOTORS_Disable();
-
-
 }
 
 void State_Enter_TUNE(void)
 {
 
-//button_pushed = false;
-//
+button_pushed = false;
+
+
 HAL_GPIO_WritePin(GPIOA, LD2_Pin, 1);
 //PIDController_Init(&PID_Speed, SAMPLE_TIME);
 //PIDController_SetLimits(&PID_Speed, outputMin, outputMax, IntegralMin, IntegralMax);
@@ -161,7 +160,7 @@ void State_InState_TUNE(void)
 		HAL_TIM_Base_Stop_IT(&htim3);
 
 		PIDController_Init(&PID_Speed, SAMPLE_TIME);
-		PIDController_SetGain(&PID, Kp, Ki, Kd)
+		PIDController_SetGain(&PID_Speed, Kp, Ki, Kd);
  }
 	HAL_TIM_Base_Start_IT(&htim3);
 

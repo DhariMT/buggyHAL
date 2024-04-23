@@ -38,6 +38,6 @@ typedef struct {
 void  PIDController_Init(PIDController *pid, uint8_t samplingPeriod_ms);
 void  PIDController_SetGain(PIDController *pid, double Kp, double Ki, double Kd);
 void  PIDController_SetLimits(PIDController *pid, int16_t outputMin, int16_t outputMax, int16_t IntegralMin, int16_t IntegralMax);
-void PIDController_Update(PIDController *pid, int16_t setpoint, int16_t input);
+int16_t  PIDController_Update(PIDController *pid, int16_t setpoint, int16_t input);
 
 #endif
