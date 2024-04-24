@@ -1,6 +1,9 @@
 #ifndef PID_CONTROLLER_H
 #define PID_CONTROLLER_H
 #include "main.h"
+
+#define INTEGRATOR_MAX 1000000
+
 typedef struct {
 
 	/* Controller gains */
@@ -23,8 +26,7 @@ typedef struct {
 	float T;
 
 	/* Controller "memory" */
-	float integrator;
-	int16_t prevError;			/* Required for integrator */
+	float integratorError;
 	float differentiator;
 	int16_t prevInput;		/* Required for differentiator */
 

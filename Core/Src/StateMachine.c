@@ -147,7 +147,6 @@ void State_InState_TUNE(void)
 
 		HAL_TIM_Base_Stop_IT(&htim3);
 
-		//PIDController_Init(&PID_Speed, SAMPLE_TIME);
 		PIDController_SetGain(&PIDleft_Speed, KpLeft, KiLeft, KdLeft);
 		HAL_TIM_Base_Start_IT(&htim3);
  }
@@ -156,7 +155,7 @@ void State_InState_TUNE(void)
 
 		HAL_TIM_Base_Stop_IT(&htim3);
 
-		//PIDController_Init(&PID_Speed, SAMPLE_TIME);
+
 		PIDController_SetGain(&PIDright_Speed, KpRight, KiRight, KdRight);
 		HAL_TIM_Base_Start_IT(&htim3);
  }
@@ -169,31 +168,13 @@ void State_InState_TUNE(void)
 
 void State_InState_CONSTANT_SPEED(void) {
 
-//	 uint16_t currentTime;
-//	 uint16_t timeChange;
-//
-//	 currentTime = HAL_GetTick();
-//	 timeChange = currentTime - PID_Speed.lastTime;
-//	 if ( timeChange >= 100 ) {
-//		PID_Speed.Kp = Kp;
-//		PID_Speed.Ki = Ki;
-//		PID_Speed.Kd = Kd;
-//	    //int32_t PID_Out;
-//	    PIDController_Update(&PID_Speed, 500, myFilterLeft.filteredVelocity);
-////	 MOTOR_LEFT_SetPWM(PID_Out);
-//
-//	 }
-
-	//MOTOR_LEFT_SetPWM(LEFT);
-	//HAL_Delay(1);
-
 
 }
 
 
 void State_Exit_RESET(void)
 {
-	//HAL_Delay(1);
+
 	resetEncoder();
 	resetFilter();
 
@@ -217,7 +198,6 @@ void State_Exit_RESET(void)
 
 
 	MOTORS_Reset();
-	//MOTORS_Disable();
 
 	HAL_Delay(1);
 }
@@ -237,8 +217,6 @@ void State_Exit_TUNE(void)
 
 void State_Exit_CONSTANT_SPEED(void)
 {
-	//HAL_TIM_Base_Stop_IT(&htim3);
-//	HAL_GPIO_WritePin(GPIOA, LD2_Pin, 0);
 	HAL_Delay(1);
 }
 
@@ -253,19 +231,18 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 		button_pushed = true;
 
 	}
-//	else if (states != RESET_StateMachine) {
-//
-//	}
+
 }
 
 
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim)
 {
-
+	  // Updating encoder velocities and declare required PID outputs
 	  int16_t outputLeft, outputRight;
 	  updateEncoder(SAMPLE_TIME);
 
+	  // apply a simple FIR filter before adding input to speed PID
 	  computeFilter(&myFilterLeft, leftWheel.velocity);
 	  outputLeft = PIDController_Update(&PIDleft_Speed, LEFT, myFilterLeft.filteredVelocity);
 	  MOTOR_LEFT_SetPWM(outputLeft);

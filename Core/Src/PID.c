@@ -1,22 +1,23 @@
 #include "PID.h"
 
+#ifndef MAX_PWM
+#define MAX_PWM 3000
+#endif
 
 
 void PIDController_Init(PIDController *pid, uint8_t samplingPeriod_ms) {
 
 	/* Clear controller variables */
-	pid->integrator = 0.0f;
-	pid->prevError  = 0.0;
 
 	pid->differentiator  = 0.0f;
 	pid->prevInput = 0.0;
 
 	pid->out = 0.0;
 
-//	pid->limMax = 0;
-//	pid->limMin = 0;
-//	pid->limMinInt = 0;
-//	pid->limMaxInt = 0;
+	pid->limMax = MAX_PWM;
+	pid->limMin = -MAX_PWM;
+	pid->limMinInt = -MAX_PWM;
+	pid->limMaxInt = MAX_PWM;
 
 	pid->lastTime = HAL_GetTick();
 	pid->T = samplingPeriod_ms / 1000;
@@ -27,7 +28,6 @@ void  PIDController_SetGain(PIDController *pid, double Kp, double Ki, double Kd)
 	pid->Kp = Kp;
 	pid->Ki = Ki;
 	pid->Kd = Kd;
-
 
 }
 
@@ -58,19 +58,22 @@ int16_t PIDController_Update(PIDController *pid, int16_t setpoint, int16_t input
 	/*
 	* Integral
 	*/
-
-    pid->integrator = pid->integrator + 0.5f * pid->Ki * pid->T * (error + pid->prevError);
+    pid->integratorError += (error);
 
 	/* Anti-wind-up via integrator clamping */
-    if (pid->integrator > pid->limMaxInt) {
+    if (pid->integratorError > INTEGRATOR_MAX) {
 
-        pid->integrator = pid->limMaxInt;
+    	pid->integratorError = INTEGRATOR_MAX;
 
-    } else if (pid->integrator < pid->limMinInt) {
+    } else if (pid->integratorError < -INTEGRATOR_MAX) {
 
-        pid->integrator = pid->limMinInt;
+    	pid->integratorError = -INTEGRATOR_MAX;
 
     }
+
+    double integrator =  pid->Ki * pid->T * pid->integratorError;
+
+
 
 
 	/*
@@ -82,10 +85,7 @@ int16_t PIDController_Update(PIDController *pid, int16_t setpoint, int16_t input
 //                        / (2.0f * pid->tau + pid->T);
 
 
-	/*
-	* Compute output and apply limits
-	*/
-    pid->out = (int16_t)(proportional + pid->integrator + pid->differentiator);
+    pid->out = (int16_t)(proportional + integrator + pid->differentiator);
 
     if (pid->out > pid->limMax) {
 
@@ -97,10 +97,11 @@ int16_t PIDController_Update(PIDController *pid, int16_t setpoint, int16_t input
 
     }
 
-	/* Store error and measurement for later use */
-    pid->prevError       = error;
+	/* Store measurement for later use */
     pid->prevInput = input;
-
+	/* Store last time for state machine use */
     pid->lastTime = HAL_GetTick();
+
+    // return PID output
     return pid->out;
 }

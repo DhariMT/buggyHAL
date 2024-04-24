@@ -1,5 +1,5 @@
-../Core/Src/Motors.c:20:6:MOTORS_Reset	1
-../Core/Src/Motors.c:32:6:MOTOR_LEFT_SetPWM	4
-../Core/Src/Motors.c:58:6:MOTOR_RIGHT_SetPWM	4
-../Core/Src/Motors.c:91:6:MOTORS_Enable	1
-../Core/Src/Motors.c:95:6:MOTORS_Disable	1
+../Core/Src/Motors.c:22:6:MOTORS_Reset	1
+../Core/Src/Motors.c:34:6:MOTOR_LEFT_SetPWM	4
+../Core/Src/Motors.c:60:6:MOTOR_RIGHT_SetPWM	4
+../Core/Src/Motors.c:93:6:MOTORS_Enable	1
+../Core/Src/Motors.c:97:6:MOTORS_Disable	1
