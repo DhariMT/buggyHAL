@@ -3,9 +3,7 @@
 #include "main.h"
 
 #define INTEGRATOR_MAX 1000000
-#define KP 6
-#define KI 4
-#define KD 3
+
 typedef struct {
 
 	/* Controller gains */

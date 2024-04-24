@@ -5,6 +5,12 @@
 #include "PID.h"
 #include "Encoder.h"
 
+#define KP 6
+#define KI 4
+#define KD 3
+
+#define SET_SPEED 300
+
 #define MAX_PWM 3000
 #define SAMPLE_TIME 10 //milliseconds
 /*
@@ -102,7 +108,18 @@ button_pushed = false;
 
 //
 HAL_GPIO_WritePin(GPIOA, LD2_Pin, 1);
-HAL_Delay(1);
+
+HAL_TIM_Base_Stop_IT(&htim3);
+
+PIDController_Init(&PIDleft_Speed);
+PIDController_SetGain(&PIDleft_Speed, KP, KI, KD);
+
+
+PIDController_Init(&PIDright_Speed);
+PIDController_SetGain(&PIDright_Speed, KP, KI, KD);
+
+HAL_TIM_Base_Start_IT(&htim3);
+
 //PIDController_Init(&PID_Speed, SAMPLE_TIME);
 //PIDController_SetLimits(&PID_Speed, outputMin, outputMax, IntegralMin, IntegralMax);
 //PID_Speed.Kp = Kp;
@@ -139,28 +156,28 @@ void State_InState_IDLE(void)
 void State_InState_TUNE(void)
 {
 
-	if (KpLeft != PIDleft_Speed.Kp || KiLeft != PIDleft_Speed.Ki || KdLeft != PIDleft_Speed.Kd) {
-
-		HAL_TIM_Base_Stop_IT(&htim3);
-
-		MOTOR_LEFT_SetPWM(0);
-		PIDController_Init(&PIDleft_Speed);
-		PIDController_SetGain(&PIDleft_Speed, KpLeft, KiLeft, KdLeft);
-
-		HAL_TIM_Base_Start_IT(&htim3);
- }
-
-	if (KpRight != PIDright_Speed.Kp || KiRight != PIDright_Speed.Ki || KdRight != PIDright_Speed.Kd) {
-
-		HAL_TIM_Base_Stop_IT(&htim3);
-
-
-		MOTOR_RIGHT_SetPWM(0);
-		PIDController_Init(&PIDright_Speed);
-
-		PIDController_SetGain(&PIDright_Speed, KpRight, KiRight, KdRight);
-		HAL_TIM_Base_Start_IT(&htim3);
- }
+//	if (KpLeft != PIDleft_Speed.Kp || KiLeft != PIDleft_Speed.Ki || KdLeft != PIDleft_Speed.Kd) {
+//
+//		HAL_TIM_Base_Stop_IT(&htim3);
+//
+//		MOTOR_LEFT_SetPWM(0);
+//		PIDController_Init(&PIDleft_Speed);
+//		PIDController_SetGain(&PIDleft_Speed, KpLeft, KiLeft, KdLeft);
+//
+//		HAL_TIM_Base_Start_IT(&htim3);
+// }
+//
+//	if (KpRight != PIDright_Speed.Kp || KiRight != PIDright_Speed.Ki || KdRight != PIDright_Speed.Kd) {
+//
+//		HAL_TIM_Base_Stop_IT(&htim3);
+//
+//
+//		MOTOR_RIGHT_SetPWM(0);
+//		PIDController_Init(&PIDright_Speed);
+//
+//		PIDController_SetGain(&PIDright_Speed, KpRight, KiRight, KdRight);
+//		HAL_TIM_Base_Start_IT(&htim3);
+// }
 
 }
 
@@ -241,11 +258,11 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim)
 
 	  // apply a simple FIR filter before adding input to speed PID
 	  computeFilter(&myFilterLeft, leftWheel.velocity);
-	  outputLeft = PIDController_Update(&PIDleft_Speed, LEFT, myFilterLeft.filteredVelocity);
+	  outputLeft = PIDController_Update(&PIDleft_Speed, SET_SPEED, myFilterLeft.filteredVelocity);
 	  MOTOR_LEFT_SetPWM(outputLeft);
 
 	  computeFilter(&myFilterRight, rightWheel.velocity);
-	  outputRight = PIDController_Update(&PIDright_Speed, RIGHT, myFilterRight.filteredVelocity);
+	  outputRight = PIDController_Update(&PIDright_Speed, SET_SPEED, myFilterRight.filteredVelocity);
 	  MOTOR_RIGHT_SetPWM(outputRight);
 
 
