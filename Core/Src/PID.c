@@ -5,14 +5,16 @@
 #endif
 
 
-void PIDController_Init(PIDController *pid, uint8_t samplingPeriod_ms) {
+void PIDController_Init(PIDController *pid) {
 
 	/* Clear controller variables */
 
 	pid->differentiator  = 0.0f;
-	pid->prevInput = 0.0;
+	pid->integratorError = 0.0f;
 
-	pid->out = 0.0;
+	pid->Kp = 0;
+	pid->Ki = 0;
+	pid->Kd = 0;
 
 	pid->limMax = MAX_PWM;
 	pid->limMin = -MAX_PWM;
@@ -20,7 +22,12 @@ void PIDController_Init(PIDController *pid, uint8_t samplingPeriod_ms) {
 	pid->limMaxInt = MAX_PWM;
 
 	pid->lastTime = HAL_GetTick();
-	pid->T = samplingPeriod_ms / 1000;
+	pid->prevInput = 0;
+	pid->prevError = 0;
+
+
+	pid->T = 0.01f;
+	pid->out = 0.0;
 }
 
 void  PIDController_SetGain(PIDController *pid, double Kp, double Ki, double Kd) {
@@ -80,9 +87,7 @@ int16_t PIDController_Update(PIDController *pid, int16_t setpoint, int16_t input
 	* Derivative (band-limited differentiator)
 	*/
 
-//    pid->differentiator = -(2.0f * pid->Kd * (input - pid->prevInput)	/* Note: derivative on measurement, therefore minus sign in front of equation! */
-//                        + (2.0f * pid->tau - pid->T) * pid->differentiator)
-//                        / (2.0f * pid->tau + pid->T);
+    pid->differentiator = (  pid->Kd * (error - pid->prevError)	) / (pid->T);
 
 
     pid->out = (int16_t)(proportional + integrator + pid->differentiator);
@@ -99,6 +104,7 @@ int16_t PIDController_Update(PIDController *pid, int16_t setpoint, int16_t input
 
 	/* Store measurement for later use */
     pid->prevInput = input;
+    pid->prevError = error;
 	/* Store last time for state machine use */
     pid->lastTime = HAL_GetTick();
 

@@ -29,7 +29,6 @@ PIDController PIDleft_Speed, PIDright_Speed;
 
 
 
-
 states StateMachine(states Current_State)
 {
     states Next_State = Current_State;
@@ -50,7 +49,6 @@ states StateMachine(states Current_State)
            break;
     case TUNE:
     	if (button_pushed) {
-    		//Next_State = CONSTANT_SPEED;
     		Next_State = IDLE;
     	}
     	break;
@@ -95,8 +93,6 @@ void State_Enter_IDLE(void)
 {
 	button_pushed = false;
 	MOTORS_Disable();
-
-
 }
 
 void State_Enter_TUNE(void)
@@ -147,7 +143,10 @@ void State_InState_TUNE(void)
 
 		HAL_TIM_Base_Stop_IT(&htim3);
 
+		MOTOR_LEFT_SetPWM(0);
+		PIDController_Init(&PIDleft_Speed);
 		PIDController_SetGain(&PIDleft_Speed, KpLeft, KiLeft, KdLeft);
+
 		HAL_TIM_Base_Start_IT(&htim3);
  }
 
@@ -155,6 +154,9 @@ void State_InState_TUNE(void)
 
 		HAL_TIM_Base_Stop_IT(&htim3);
 
+
+		MOTOR_RIGHT_SetPWM(0);
+		PIDController_Init(&PIDright_Speed);
 
 		PIDController_SetGain(&PIDright_Speed, KpRight, KiRight, KdRight);
 		HAL_TIM_Base_Start_IT(&htim3);
@@ -174,16 +176,14 @@ void State_InState_CONSTANT_SPEED(void) {
 
 void State_Exit_RESET(void)
 {
-
+	HAL_TIM_Base_Stop_IT(&htim3);
 	resetEncoder();
 	resetFilter();
 
 
-	PIDController_Init(&PIDleft_Speed, SAMPLE_TIME);
-	PIDController_SetLimits(&PIDleft_Speed,MAX_PWM , 0, MAX_PWM, 0);
+	PIDController_Init(&PIDleft_Speed);
+	PIDController_Init(&PIDright_Speed);
 
-	PIDController_Init(&PIDright_Speed, SAMPLE_TIME);
-	PIDController_SetLimits(&PIDright_Speed,MAX_PWM , 0, MAX_PWM, 0);
 
 	KpLeft = 0;
 	KiLeft = 0;
@@ -198,26 +198,23 @@ void State_Exit_RESET(void)
 
 
 	MOTORS_Reset();
-
-	HAL_Delay(1);
+	HAL_TIM_Base_Start_IT(&htim3);
 }
 
 void State_Exit_IDLE(void)
 {
 	MOTORS_Enable();
-	//MOTORS_Reset();
-	//HAL_Delay(1);
-	//MOTORS_Enable();
 }
 
 void State_Exit_TUNE(void)
 {
+
 	HAL_GPIO_WritePin(GPIOA, LD2_Pin, 0);
+
 }
 
 void State_Exit_CONSTANT_SPEED(void)
 {
-	HAL_Delay(1);
 }
 
 

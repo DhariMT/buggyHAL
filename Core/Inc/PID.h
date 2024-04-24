@@ -3,16 +3,16 @@
 #include "main.h"
 
 #define INTEGRATOR_MAX 1000000
-
+#define KP 6
+#define KI 4
+#define KD 3
 typedef struct {
 
 	/* Controller gains */
-	float Kp;
-	float Ki;
-	float Kd;
+	double Kp;
+	double Ki;
+	double Kd;
 
-	/* Derivative low-pass filter time constant */
-	float tau;
 
 	/* Output limits */
 	int16_t limMin;
@@ -23,12 +23,13 @@ typedef struct {
 	int16_t limMaxInt;
 
 	/* Sample time (in seconds) */
-	float T;
+	double T;
 
 	/* Controller "memory" */
-	float integratorError;
-	float differentiator;
-	int16_t prevInput;		/* Required for differentiator */
+	double integratorError;
+	double differentiator;
+	int16_t prevInput;
+	int16_t prevError;
 
 	uint8_t lastTime;
 
@@ -37,7 +38,7 @@ typedef struct {
 
 } PIDController;
 
-void  PIDController_Init(PIDController *pid, uint8_t samplingPeriod_ms);
+void  PIDController_Init(PIDController *pid);
 void  PIDController_SetGain(PIDController *pid, double Kp, double Ki, double Kd);
 void  PIDController_SetLimits(PIDController *pid, int16_t outputMin, int16_t outputMax, int16_t IntegralMin, int16_t IntegralMax);
 int16_t  PIDController_Update(PIDController *pid, int16_t setpoint, int16_t input);
