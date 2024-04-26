@@ -28,17 +28,22 @@ states button_pushed;
 
 double KpLeft, KiLeft, KdLeft, KpRight, KiRight, KdRight;
 
-int16_t LEFT, RIGHT, IntegralMax, IntegralMin, outputMin, outputMax;
+int16_t LEFT, RIGHT;
 
-PIDController PIDleft_Speed, PIDright_Speed;
+
 
 
 
 
 states StateMachine(states Current_State)
 {
-    states Next_State = Current_State;
+	static states Next_State = Current_State;
 
+    /*
+     * Main variables, declared as
+     */
+    static PIDController PIDleft_Speed, PIDright_Speed;
+    static uint16_t * mySensor;
     switch ( Current_State )
     {
 

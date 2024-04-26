@@ -46,28 +46,23 @@ void  PIDController_SetLimits(PIDController *pid, int16_t outputMax, int16_t out
 
 	pid->limMaxInt = IntegralMax;
 	pid->limMinInt= IntegralMin;
+
 }
 
 int16_t PIDController_Update(PIDController *pid, int16_t setpoint, int16_t input) {
 
-	/*
-	* Error signal
-	*/
+
 	int16_t error = setpoint - input;
 
 
-	/*
-	* Proportional
-	*/
+
     double proportional = pid->Kp * error;
 
 
-	/*
-	* Integral
-	*/
+
     pid->integratorError += (error);
 
-	/* Anti-wind-up via integrator clamping */
+	// Limit integration part to avoid system saturation // anti-wind coupling
     if (pid->integratorError > INTEGRATOR_MAX) {
 
     	pid->integratorError = INTEGRATOR_MAX;
@@ -83,9 +78,59 @@ int16_t PIDController_Update(PIDController *pid, int16_t setpoint, int16_t input
 
 
 
-	/*
-	* Derivative (band-limited differentiator)
-	*/
+    pid->differentiator = (  pid->Kd * (error - pid->prevError)	) / (pid->T);
+
+
+    pid->out = (int16_t)(proportional + integrator + pid->differentiator);
+
+    if (pid->out > MAX_PWM) {
+
+        pid->out = MAX_PWM;
+
+    } else if (pid->out < -MAX_PWM) {
+
+        pid->out = -MAX_PWM;
+
+    }
+
+	// Store measurement for integral and derivative action
+    pid->prevInput = input;
+    pid->prevError = error;
+	// Store time stamp for state machine use
+    pid->lastTime = HAL_GetTick();
+
+
+    return pid->out;
+}
+
+int16_t PIDLineSensor_Update(PIDController *pid, int16_t setpoint, int16_t input) {
+
+
+	int16_t error = setpoint - input;
+
+
+
+    double proportional = pid->Kp * error;
+
+
+
+    pid->integratorError += (error);
+
+	// Limit integration part to avoid system saturation // anti-wind coupling
+    if (pid->integratorError > INTEGRATOR_MAX) {
+
+    	pid->integratorError = INTEGRATOR_MAX;
+
+    } else if (pid->integratorError < -INTEGRATOR_MAX) {
+
+    	pid->integratorError = -INTEGRATOR_MAX;
+
+    }
+
+    double integrator =  pid->Ki * pid->T * pid->integratorError;
+
+
+
 
     pid->differentiator = (  pid->Kd * (error - pid->prevError)	) / (pid->T);
 
@@ -102,12 +147,12 @@ int16_t PIDController_Update(PIDController *pid, int16_t setpoint, int16_t input
 
     }
 
-	/* Store measurement for later use */
+	// Store measurement for integral and derivative action
     pid->prevInput = input;
     pid->prevError = error;
-	/* Store last time for state machine use */
+	// Store time stamp for state machine use
     pid->lastTime = HAL_GetTick();
 
-    // return PID output
+
     return pid->out;
 }

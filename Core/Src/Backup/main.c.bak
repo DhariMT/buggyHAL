@@ -30,6 +30,7 @@
 #include "Encoder.h"
 #include "PID.h"
 #include "StateMachine.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -52,10 +53,9 @@
 /* USER CODE BEGIN PV */
 
 
-//uint16_t ReadingADC[5];
+uint16_t ReadingADC[5];
 
 
-//PID_TypeDef PID_Speed;
 
 //motor_instance leftMotor, rightMotor;
 
@@ -85,13 +85,11 @@ void SystemClock_Config(void);
   */
 int main(void)
 {
+
   /* USER CODE BEGIN 1 */
-	states Current_State = IDLE;
+	states Current_State = RESET_StateMachine;
 
 	//motor_instance leftMotor, rightMotor;
-
-	resetEncoder();
-	resetFilter();
 
 
 	//uint8_t buffer[27] = "Welcome to BinaryUpdates!\r\n";
@@ -125,7 +123,9 @@ int main(void)
   MX_USART2_UART_Init();
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
-
+  //HAL_ADC_Start_DMA(&hadc1,ReadingADC, 5);
+  MOTORS_Reset();
+  MOTORS_Enable();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -133,7 +133,7 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-	  Current_State = StateMachine(Current_State);
+
     /* USER CODE BEGIN 3 */
   }
 

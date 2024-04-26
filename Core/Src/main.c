@@ -53,7 +53,7 @@
 /* USER CODE BEGIN PV */
 
 
-uint16_t ReadingADC[5];
+
 
 
 
@@ -85,13 +85,11 @@ void SystemClock_Config(void);
   */
 int main(void)
 {
+
   /* USER CODE BEGIN 1 */
 	states Current_State = RESET_StateMachine;
 
-	//motor_instance leftMotor, rightMotor;
 
-
-	//uint8_t buffer[27] = "Welcome to BinaryUpdates!\r\n";
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -107,6 +105,7 @@ int main(void)
 
   /* Configure the system clock */
   SystemClock_Config();
+
   /* USER CODE BEGIN SysInit */
 
   /* USER CODE END SysInit */
@@ -121,7 +120,7 @@ int main(void)
   MX_USART2_UART_Init();
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
-  //HAL_ADC_Start_DMA(&hadc1,ReadingADC, 5);
+
   MOTORS_Reset();
   MOTORS_Enable();
   /* USER CODE END 2 */
@@ -131,8 +130,7 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-	  Current_State = StateMachine(Current_State);
-	 // MOTOR_LEFT_SetPWM(500);
+
     /* USER CODE BEGIN 3 */
   }
 

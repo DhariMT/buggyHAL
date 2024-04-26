@@ -5,8 +5,14 @@
 #include "PID.h"
 #include "Encoder.h"
 
+#define KP 6
+#define KI 4
+#define KD 3
+
+#define SET_SPEED 300
+
 #define MAX_PWM 3000
-#define SAMPLE_TIME 1 //milliseconds
+#define SAMPLE_TIME 10 //milliseconds
 /*
  * flags are of type uint8_t
  * List of all flags is:
@@ -14,20 +20,17 @@
  *
  */
 
-uint8_t button_pushed = false;
+voidFunc UponEnter[S_NUM] =   {State_Enter_RESET, State_Enter_IDLE,  State_Enter_TUNE,  State_Enter_CONSTANT_SPEED};
+voidFunc ActionWhileInState[S_NUM] = {State_InState_RESET, State_InState_IDLE, State_InState_TUNE, State_InState_CONSTANT_SPEED};
+voidFunc  UponExit[S_NUM] =           {State_Exit_RESET,  State_Exit_IDLE, State_Exit_TUNE , State_Exit_CONSTANT_SPEED};
 
+states button_pushed;
 
+double KpLeft, KiLeft, KdLeft, KpRight, KiRight, KdRight;
 
-double Kp, Ki, Kd;
+int16_t LEFT, RIGHT, IntegralMax, IntegralMin, outputMin, outputMax;
 
-int16_t LEFT, RIGHT, outputMax, outputMin, IntegralMin, IntegralMax;
-
-PIDController PID_Speed;
-
-voidFunc UponEnter[S_NUM] =          {State_Enter_IDLE,   State_Enter_CONSTANT_SPEED};
-voidFunc ActionWhileInState[S_NUM] = {State_InState_IDLE, State_InState_CONSTANT_SPEED};
-voidFunc UponExit[S_NUM] =           {State_Exit_IDLE,    State_Exit_CONSTANT_SPEED};
-
+PIDController PIDleft_Speed, PIDright_Speed;
 
 
 
@@ -38,29 +41,34 @@ states StateMachine(states Current_State)
 
     switch ( Current_State )
     {
-    case IDLE:
+
     	/* State IDLE START */
 
+    case RESET_StateMachine:
+    	Next_State = IDLE;
+    	break;
+    case IDLE:
     	if (button_pushed) {
-    		Next_State = CONSTANT_SPEED;
+    	Next_State = TUNE;
     	}
-
     	/* State IDLE END */
            break;
-    case CONSTANT_SPEED:
-
-    	/* State SPIN_TIRES START */
-
+    case TUNE:
     	if (button_pushed) {
     		Next_State = IDLE;
     	}
+    	break;
 
-    	/* State SPIN_TIRES END */
-           break;
+    case CONSTANT_SPEED:
+    	if (button_pushed) {
+    		Next_State = IDLE;
+    	}
+    	break;
+    	/* State SPIN_TIRES START */
+
            // The program should never arrive here
        default:
            break;
-
     }
 
     if (Next_State != Current_State)
@@ -81,110 +89,183 @@ states StateMachine(states Current_State)
 
 
 
+void State_Enter_RESET() {
 
+
+
+}
 
 void State_Enter_IDLE(void)
 {
-	outputMax = MAX_PWM;
-	outputMin = 0;
-	IntegralMin = 0;
-	IntegralMax = MAX_PWM;
-	Kp = 0;
-	Ki = 0;
-	Kd = 0;
+	button_pushed = false;
+	MOTORS_Disable();
+}
 
+void State_Enter_TUNE(void)
+{
+
+button_pushed = false;
+
+//
+HAL_GPIO_WritePin(GPIOA, LD2_Pin, 1);
+
+HAL_TIM_Base_Stop_IT(&htim3);
+
+PIDController_Init(&PIDleft_Speed);
+PIDController_SetGain(&PIDleft_Speed, KP, KI, KD);
+
+
+PIDController_Init(&PIDright_Speed);
+PIDController_SetGain(&PIDright_Speed, KP, KI, KD);
+
+HAL_TIM_Base_Start_IT(&htim3);
+
+//PIDController_Init(&PID_Speed, SAMPLE_TIME);
+//PIDController_SetLimits(&PID_Speed, outputMin, outputMax, IntegralMin, IntegralMax);
+//PID_Speed.Kp = Kp;
+//PID_Speed.Ki = Ki;
+//PID_Speed.Kd = Kd;
+//
+//MOTORS_Enable();
+}
+void State_Enter_CONSTANT_SPEED(void)
+
+{
+	button_pushed = false;
+	//MOTORS_Disable();
+
+//	button_pushed = false;
+//
+//
+//	MOTORS_Enable();
+
+
+}
+
+
+void State_InState_RESET(void)
+{
+	//HAL_Delay(1);
+}
+
+void State_InState_IDLE(void)
+{
+	//HAL_Delay(1);
+}
+
+void State_InState_TUNE(void)
+{
+
+//	if (KpLeft != PIDleft_Speed.Kp || KiLeft != PIDleft_Speed.Ki || KdLeft != PIDleft_Speed.Kd) {
+//
+//		HAL_TIM_Base_Stop_IT(&htim3);
+//
+//		MOTOR_LEFT_SetPWM(0);
+//		PIDController_Init(&PIDleft_Speed);
+//		PIDController_SetGain(&PIDleft_Speed, KpLeft, KiLeft, KdLeft);
+//
+//		HAL_TIM_Base_Start_IT(&htim3);
+// }
+//
+//	if (KpRight != PIDright_Speed.Kp || KiRight != PIDright_Speed.Ki || KdRight != PIDright_Speed.Kd) {
+//
+//		HAL_TIM_Base_Stop_IT(&htim3);
+//
+//
+//		MOTOR_RIGHT_SetPWM(0);
+//		PIDController_Init(&PIDright_Speed);
+//
+//		PIDController_SetGain(&PIDright_Speed, KpRight, KiRight, KdRight);
+//		HAL_TIM_Base_Start_IT(&htim3);
+// }
+
+}
+
+
+
+
+
+void State_InState_CONSTANT_SPEED(void) {
+
+
+}
+
+
+void State_Exit_RESET(void)
+{
+	HAL_TIM_Base_Stop_IT(&htim3);
+	resetEncoder();
+	resetFilter();
+
+
+	PIDController_Init(&PIDleft_Speed);
+	PIDController_Init(&PIDright_Speed);
+
+
+	KpLeft = 0;
+	KiLeft = 0;
+	KdLeft = 0;
+
+	KpRight = 0;
+	KiRight = 0;
+	KdRight = 0;
 
 	LEFT = 0;
 	RIGHT = 0;
 
-	button_pushed = false;
-	MOTORS_Disable();
+
 	MOTORS_Reset();
+	HAL_TIM_Base_Start_IT(&htim3);
 }
-
-void State_Enter_CONSTANT_SPEED(void)
-
-{
-
-
-	button_pushed = false;
-
-	PIDController_Init(&PID_Speed, SAMPLE_TIME);
-	HAL_GPIO_WritePin(GPIOA, LD2_Pin, 1);
-
-
-	PIDController_SetLimits(&PID_Speed, outputMax, outputMin, IntegralMin, IntegralMax);
-	MOTOR_RIGHT_SetPWM(0);
-	MOTOR_LEFT_SetPWM(0);
-	MOTORS_Enable();
-
-
-}
-
-
-
-
-
-void State_InState_IDLE(void)
-{
-	button_pushed = button_pushed;
-}
-
-void State_InState_CONSTANT_SPEED(void) {
-
-//	 uint16_t currentTime;
-//	 uint16_t timeChange;
-//
-//	 currentTime = HAL_GetTick();
-//	 timeChange = currentTime - PID_Speed.lastTime;
-//	 if ( timeChange >= 100 ) {
-//		PID_Speed.Kp = Kp;
-//		PID_Speed.Ki = Ki;
-//		PID_Speed.Kd = Kd;
-//	    //int32_t PID_Out;
-//	    PIDController_Update(&PID_Speed, 500, myFilterLeft.filteredVelocity);
-////	 MOTOR_LEFT_SetPWM(PID_Out);
-//
-//	 }
-
-	//MOTOR_LEFT_SetPWM(LEFT);
-	PIDController_SetGain(&PID_Speed, Kp, Ki, Kd);
-
-}
-
-
-
 
 void State_Exit_IDLE(void)
 {
+	MOTORS_Enable();
+}
+
+void State_Exit_TUNE(void)
+{
+
+	HAL_GPIO_WritePin(GPIOA, LD2_Pin, 0);
 
 }
 
 void State_Exit_CONSTANT_SPEED(void)
 {
-	//HAL_TIM_Base_Stop_IT(&htim3);
-	HAL_GPIO_WritePin(GPIOA, LD2_Pin, 0);
 }
 
-////////////////////////
+
+
+//////////////////////// Peripheral Interrupts/Callbacks
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
 
 	if (GPIO_Pin == Button_Pin) {
 		button_pushed = true;
+
 	}
 
 }
 
+
+
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim)
 {
-
-
+	  // Updating encoder velocities and declare required PID outputs
+	  int16_t outputLeft, outputRight;
 	  updateEncoder(SAMPLE_TIME);
+
+	  // apply a simple FIR filter before adding input to speed PID
 	  computeFilter(&myFilterLeft, leftWheel.velocity);
+	  outputLeft = PIDController_Update(&PIDleft_Speed, SET_SPEED, myFilterLeft.filteredVelocity);
+	  MOTOR_LEFT_SetPWM(outputLeft);
 
-	  PIDController_Update(&PID_Speed, LEFT, myFilterLeft.filteredVelocity);
-	  MOTOR_LEFT_SetPWM(PID_Speed.out);
+	  computeFilter(&myFilterRight, rightWheel.velocity);
+	  outputRight = PIDController_Update(&PIDright_Speed, SET_SPEED, myFilterRight.filteredVelocity);
+	  MOTOR_RIGHT_SetPWM(outputRight);
+
+
+
+
 }
-

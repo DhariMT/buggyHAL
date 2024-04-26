@@ -9,8 +9,10 @@
 
 #include "Motors.h"
 
-
+#ifndef MAX_PWM
 #define MAX_PWM 3000
+#endif
+
 #define UNIPOLAR 0
 #define BIPOLAR 1
 #define FORWARD 1
@@ -44,7 +46,7 @@ void MOTOR_LEFT_SetPWM(const int16_t PWM) {
 
 	if (PWM >= 0) {
 		HAL_GPIO_WritePin(directionLeft_GPIO_Port, directionLeft_Pin, FORWARD); // Sets direction forward assuming unipolar
-		_PWM = (MAX_PWM - PWM);
+		_PWM = (MAX_PWM - PWM); // Driver uses negative logic. Higher values result in slower speed
 		__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, _PWM);
 	}
 	else {
@@ -68,9 +70,9 @@ void MOTOR_RIGHT_SetPWM(const int16_t PWM) {
 
 	int16_t _PWM;
 
-	if (_PWM >= 0) {
+	if (PWM >= 0) {
 		HAL_GPIO_WritePin(directionRight_GPIO_Port, directionRight_Pin, FORWARD);// Sets direction forward assuming unipolar
-		_PWM = (MAX_PWM - PWM);
+		_PWM = (MAX_PWM - PWM); // Driver uses negative logic. Higher values result in slower speed
 		__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, _PWM);
 	}
 

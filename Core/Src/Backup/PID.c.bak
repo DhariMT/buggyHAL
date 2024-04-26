@@ -1,25 +1,33 @@
 #include "PID.h"
 
+#ifndef MAX_PWM
+#define MAX_PWM 3000
+#endif
 
 
-void PIDController_Init(PIDController *pid, uint8_t samplingPeriod_ms) {
+void PIDController_Init(PIDController *pid) {
 
 	/* Clear controller variables */
-	pid->integrator = 0.0f;
-	pid->prevError  = 0.0;
 
 	pid->differentiator  = 0.0f;
-	pid->prevInput = 0.0;
+	pid->integratorError = 0.0f;
 
-	pid->out = 0.0;
+	pid->Kp = 0;
+	pid->Ki = 0;
+	pid->Kd = 0;
 
-	pid->limMax = 0;
-	pid->limMin = 0;
-	pid->limMinInt = 0;
-	pid->limMaxInt = 0;
+	pid->limMax = MAX_PWM;
+	pid->limMin = -MAX_PWM;
+	pid->limMinInt = -MAX_PWM;
+	pid->limMaxInt = MAX_PWM;
 
 	pid->lastTime = HAL_GetTick();
-	pid->T = samplingPeriod_ms / 100;
+	pid->prevInput = 0;
+	pid->prevError = 0;
+
+
+	pid->T = 0.01f;
+	pid->out = 0.0;
 }
 
 void  PIDController_SetGain(PIDController *pid, double Kp, double Ki, double Kd) {
@@ -28,20 +36,20 @@ void  PIDController_SetGain(PIDController *pid, double Kp, double Ki, double Kd)
 	pid->Ki = Ki;
 	pid->Kd = Kd;
 
-
 }
 
 
-void  PIDController_SetLimits(PIDController *pid, int16_t outputMax, int16_t outputMin, int16_t IntegralMin, int16_t IntegralMax){
+void  PIDController_SetLimits(PIDController *pid, int16_t outputMax, int16_t outputMin, int16_t IntegralMax , int16_t IntegralMin){
 
 	pid->limMin = outputMin;
 	pid->limMax = outputMax;
 
 	pid->limMaxInt = IntegralMax;
 	pid->limMinInt= IntegralMin;
+
 }
 
-void PIDController_Update(PIDController *pid, int16_t setpoint, int16_t input) {
+int16_t PIDController_Update(PIDController *pid, int16_t setpoint, int16_t input) {
 
 	/*
 	* Error signal
@@ -52,40 +60,34 @@ void PIDController_Update(PIDController *pid, int16_t setpoint, int16_t input) {
 	/*
 	* Proportional
 	*/
-    float proportional = pid->Kp * error;
+    double proportional = pid->Kp * error;
 
 
 	/*
 	* Integral
 	*/
+    pid->integratorError += (error);
 
-    pid->integrator = pid->integrator + 0.5f * pid->Ki * pid->T * (error + pid->prevError);
+	// Limit integration error to avoid system saturation
+    if (pid->integratorError > INTEGRATOR_MAX) {
 
-	/* Anti-wind-up via integrator clamping */
-    if (pid->integrator > pid->limMaxInt) {
+    	pid->integratorError = INTEGRATOR_MAX;
 
-        pid->integrator = pid->limMaxInt;
+    } else if (pid->integratorError < -INTEGRATOR_MAX) {
 
-    } else if (pid->integrator < pid->limMinInt) {
-
-        pid->integrator = pid->limMinInt;
+    	pid->integratorError = -INTEGRATOR_MAX;
 
     }
 
-
-	/*
-	* Derivative (band-limited differentiator)
-	*/
-
-//    pid->differentiator = -(2.0f * pid->Kd * (input - pid->prevInput)	/* Note: derivative on measurement, therefore minus sign in front of equation! */
-//                        + (2.0f * pid->tau - pid->T) * pid->differentiator)
-//                        / (2.0f * pid->tau + pid->T);
+    double integrator =  pid->Ki * pid->T * pid->integratorError;
 
 
-	/*
-	* Compute output and apply limits
-	*/
-    pid->out = (int32_t)(proportional + pid->integrator + pid->differentiator);
+
+
+    pid->differentiator = (  pid->Kd * (error - pid->prevError)	) / (pid->T);
+
+
+    pid->out = (int16_t)(proportional + integrator + pid->differentiator);
 
     if (pid->out > pid->limMax) {
 
@@ -97,10 +99,12 @@ void PIDController_Update(PIDController *pid, int16_t setpoint, int16_t input) {
 
     }
 
-	/* Store error and measurement for later use */
-    pid->prevError       = error;
+	/* Store measurement for later use */
     pid->prevInput = input;
-
+    pid->prevError = error;
+	/* Store last time for state machine use */
     pid->lastTime = HAL_GetTick();
 
+    // return PID output
+    return pid->out;
 }
