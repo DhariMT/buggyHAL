@@ -24,7 +24,7 @@ voidFunc UponEnter[S_NUM] =   {State_Enter_RESET, State_Enter_IDLE,  State_Enter
 voidFunc ActionWhileInState[S_NUM] = {State_InState_RESET, State_InState_IDLE, State_InState_TUNE, State_InState_CONSTANT_SPEED};
 voidFunc  UponExit[S_NUM] =           {State_Exit_RESET,  State_Exit_IDLE, State_Exit_TUNE , State_Exit_CONSTANT_SPEED};
 
-states button_pushed;
+states button_pushed, speed_sampled;
 
 double KpLeft, KiLeft, KdLeft, KpRight, KiRight, KdRight;
 
