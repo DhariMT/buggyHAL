@@ -42,7 +42,8 @@ states StateMachine(states Current_State)
     /*
      * Main variables, declared as
      */
-    static PIDController PIDleft_Speed, PIDright_Speed;
+    static PID_Type1 PIDleft_Speed
+	static PID_Type1 PIDright_Speed;
     static uint16_t * mySensor;
     switch ( Current_State )
     {
@@ -116,12 +117,12 @@ HAL_GPIO_WritePin(GPIOA, LD2_Pin, 1);
 
 HAL_TIM_Base_Stop_IT(&htim3);
 
-PIDController_Init(&PIDleft_Speed);
-PIDController_SetGain(&PIDleft_Speed, KP, KI, KD);
+PIDSpeed_Init(&PIDleft_Speed);
+PIDSpeed_SetGain(&PIDleft_Speed, KP, KI, KD);
 
 
-PIDController_Init(&PIDright_Speed);
-PIDController_SetGain(&PIDright_Speed, KP, KI, KD);
+PIDSpeed_Init(&PIDright_Speed);
+PIDSpeed_SetGain(&PIDright_Speed, KP, KI, KD);
 
 HAL_TIM_Base_Start_IT(&htim3);
 
@@ -202,9 +203,8 @@ void State_Exit_RESET(void)
 	resetEncoder();
 	resetFilter();
 
-
-	PIDController_Init(&PIDleft_Speed);
-	PIDController_Init(&PIDright_Speed);
+	PIDSpeed_Init(&PIDleft_Speed);
+	PIDSpeed_Init(&PIDright_Speed);
 
 
 	KpLeft = 0;
@@ -263,11 +263,11 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim)
 
 	  // apply a simple FIR filter before adding input to speed PID
 	  computeFilter(&myFilterLeft, leftWheel.velocity);
-	  outputLeft = PIDController_Update(&PIDleft_Speed, SET_SPEED, myFilterLeft.filteredVelocity);
+	  outputLeft = PIDSpeed_Update(&PIDleft_Speed, SET_SPEED, myFilterLeft.filteredVelocity);
 	  MOTOR_LEFT_SetPWM(outputLeft);
 
 	  computeFilter(&myFilterRight, rightWheel.velocity);
-	  outputRight = PIDController_Update(&PIDright_Speed, SET_SPEED, myFilterRight.filteredVelocity);
+	  outputRight = PIDSpeed_Update(&PIDright_Speed, SET_SPEED, myFilterRight.filteredVelocity);
 	  MOTOR_RIGHT_SetPWM(outputRight);
 
 

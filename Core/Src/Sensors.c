@@ -19,7 +19,8 @@ void calibrateSensor(uint16_t *mySensor) {
 
 	/* the center sensor should map to same value. you could do ------> mySensor[2] = mySensor->mySensor[2] but pointless; */
 
-	mySensor[3] = MAX_SENSOR + mySensor[3];
+	mySensor[3] = MAX_SENSOR + mySensor->left;
+
 
 }
 

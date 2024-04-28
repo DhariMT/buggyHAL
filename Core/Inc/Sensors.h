@@ -4,9 +4,13 @@
  *  Created on: Apr 13, 2024
  *      Author: Dhari
  */
+#include "main.h"
+#include "tim"
 
 #ifndef INC_SENSORS_H_
 #define INC_SENSORS_H_
+
+
 
 #define MAX_SENSORS 5
 
