@@ -70,10 +70,6 @@ void Error_Handler(void);
 #define Encoder_CH1_GPIO_Port GPIOA
 #define Encoder_CH2_Pin GPIO_PIN_1
 #define Encoder_CH2_GPIO_Port GPIOA
-#define BLE_TX_Pin GPIO_PIN_2
-#define BLE_TX_GPIO_Port GPIOA
-#define BLE_RX_Pin GPIO_PIN_3
-#define BLE_RX_GPIO_Port GPIOA
 #define LD2_Pin GPIO_PIN_5
 #define LD2_GPIO_Port GPIOA
 #define Sensor4_Pin GPIO_PIN_4
@@ -100,6 +96,10 @@ void Error_Handler(void);
 #define PWM2_GPIO_Port GPIOA
 #define PWM1_Pin GPIO_PIN_10
 #define PWM1_GPIO_Port GPIOA
+#define BLE_RXD_Pin GPIO_PIN_11
+#define BLE_RXD_GPIO_Port GPIOA
+#define BLE_TXD_Pin GPIO_PIN_12
+#define BLE_TXD_GPIO_Port GPIOA
 #define Encoder2_CH1_Pin GPIO_PIN_15
 #define Encoder2_CH1_GPIO_Port GPIOA
 #define Encoder2_CH2_Pin GPIO_PIN_3

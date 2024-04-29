@@ -75,8 +75,6 @@ int16_t PIDSpeed_Update(PID_Type1 *pid, int16_t setpoint, int16_t input) {
     double integrator =  pid->Ki * SPEED_SAMPLE_TIME * pid->integratorError;
 
 
-
-
     pid->differentiator = (  pid->Kd * (error - pid->prevError)	) / SPEED_SAMPLE_TIME;
 
 
@@ -102,6 +100,8 @@ int16_t PIDSpeed_Update(PID_Type1 *pid, int16_t setpoint, int16_t input) {
     return pid->out;
 }
 
+
+/* position PID */
 void PIDPosition_Init(PID_Type2 *pid, double _Kp) {
 
 	pid->Kp = _Kp;

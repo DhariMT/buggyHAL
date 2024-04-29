@@ -21,34 +21,35 @@
  * speed_sampled
  * button_pushed
  *
+ *
+ *
+ *
  */
 
-voidFunc UponEnter[S_NUM] =   {State_Enter_RESET, State_Enter_IDLE,  State_Enter_TUNE,  State_Enter_CONSTANT_SPEED};
-voidFunc ActionWhileInState[S_NUM] = {State_InState_RESET, State_InState_IDLE, State_InState_TUNE, State_InState_CONSTANT_SPEED};
-voidFunc  UponExit[S_NUM] =           {State_Exit_RESET,  State_Exit_IDLE, State_Exit_TUNE , State_Exit_CONSTANT_SPEED};
+voidFunc UponEnter[S_NUM] =   {State_Enter_RESET, State_Enter_IDLE,  State_Enter_LINE_FOLLOW,  State_Enter_TUNEPID_LEFT, State_Enter_TUNEPID_RIGHT, State_Enter_TUNEPID_POSITION};
+voidFunc ActionWhileInState[S_NUM] = {State_InState_RESET, State_InState_IDLE, State_InState_LINE_FOLLOW , State_InState_TUNEPID_LEFT, State_InState_TUNEPID_RIGHT, State_InState_TUNEPID_POSITION};
+voidFunc  UponExit[S_NUM] =           {State_Exit_RESET,  State_Exit_IDLE, State_Exit_LINE_FOLLOW,  State_Exit_TUNEPID_LEFT, State_Exit_TUNEPID_RIGHT, State_Exit_TUNEPID_POSITION};
 
 
-
+/*          BLE Events enum            */
 typedef enum {
 	STOP,
-	PID1_TUNE,
-	PID2_TUNE,
+	TUNEPID_LEFT,
+	TUNEPID_RIGHT,
+	TUNEPID_POSITION,
+	PRINT_TUNING_PARAMETERS,
 	PRINT_SPEED,
 	PRINT_POSITION
 } ble;
 /*                Events            */
 uint8_t button_pushed, speed_sampled, reset_complete;
-ble ble_state;
+ble ble_message;
 
-
-
-double KpLeft, KiLeft, KdLeft, KpRight, KiRight, KdRight;
-
-int16_t LEFT, RIGHT;
-
+/*                GLOBAL VARIABLES            */
 PID_Type1 PIDleft_Speed;
 PID_Type1 PIDright_Speed;
-//uint16_t* mySensor;
+PID_Type2 LineFollower;
+
 
 
 
@@ -63,36 +64,49 @@ states StateMachine(states Current_State)
     switch ( Current_State )
     {
 
-    	/* State IDLE START */
-
+    	/* State RESET_StateMachine START */
     case RESET_StateMachine:
-    	if (reset_complete == true) {
+    	if (reset_complete) {
     	Next_State = IDLE;
     	}
     	break;
+    	/* State IDLE START */
     case IDLE:
     	if (button_pushed) {
-    	Next_State = TUNE;
+    	Next_State = LINE_FOLLOW;
     	}
-    	/* State IDLE END */
-           break;
-    case TUNE:
+        break;
+    case LINE_FOLLOW:
+    	if (button_pushed) {
+    		Next_State = TUNEPID_SPEED;
+    	}
+        /* State TUNEPID_SPEED START */
+    case TUNEPID_SPEED:
+    	if (button_pushed) {
+    		Next_State = TUNEPID_POSITION;
+    	}
+    	break;
+    	/* State TUNEPID_POSITION START*/
+    case TUNEPID_POSITION:
     	if (button_pushed) {
     		Next_State = IDLE;
     	}
     	break;
-
-    case CONSTANT_SPEED:
-    	if (button_pushed) {
-    		Next_State = IDLE;
-    	}
-    	break;
-    	/* State SPIN_TIRES START */
-
+    	/* END OF ALL POSSIBLE STATES */
            // The program should never arrive here
        default:
            break;
     }
+
+
+    /*
+     *
+     *
+     * BEGIN STATE LOOKUP TABLE
+     *
+     *
+     */
+
 
     if (Next_State != Current_State)
     {
@@ -110,61 +124,90 @@ states StateMachine(states Current_State)
 
 
 
-
+/*
+ *
+ *
+ *
+ *
+ *
+ * State Enter Functions
+ *
+ *
+ *
+ *
+ */
 
 void State_Enter_RESET() {
 
+	HAL_TIM_Base_Stop_IT(&htim3);
+	resetEncoder();
+	resetFilter();
 
+	PIDSpeed_Init(&PIDleft_Speed);
+	PIDSpeed_Init(&PIDright_Speed);
 
+	MOTORS_Reset();
+	HAL_TIM_Base_Start_IT(&htim3);
+
+	reset_complete = true;
 }
 
 void State_Enter_IDLE(void)
 {
 	button_pushed = false;
 	MOTORS_Disable();
+	HAL_UART_Transmit_IT(&huart6, "IDLE STATE", 10);
 }
 
-void State_Enter_TUNE(void)
+void State_Enter_LINE_FOLLOWER(void)
+{
+	button_pushed = false;
+	HAL_UART_Transmit_IT(&huart6, "LINE FOLLOWING STATE", 20);
+}
+
+uint8_t readingParas1[11];
+// Begin Function Enter_TUNEPID_SPEED
+void State_Enter_TUNEPID_SPEED(void)
 {
 
 button_pushed = false;
+HAL_UART_Transmit_IT(&huart6, "SPEED TUNING STATE", 18);
+HAL_UART_Receive_IT(&huart6, readingParas1, 11);
 
 //
-HAL_GPIO_WritePin(GPIOA, LD2_Pin, 1);
-
-HAL_TIM_Base_Stop_IT(&htim3);
-
-PIDSpeed_Init(&PIDleft_Speed);
-PIDSpeed_SetGain(&PIDleft_Speed, KP, KI, KD);
-
-
-PIDSpeed_Init(&PIDright_Speed);
-PIDSpeed_SetGain(&PIDright_Speed, KP, KI, KD);
-
-HAL_TIM_Base_Start_IT(&htim3);
-
-//PIDController_Init(&PID_Speed, SAMPLE_TIME);
-//PIDController_SetLimits(&PID_Speed, outputMin, outputMax, IntegralMin, IntegralMax);
-//PID_Speed.Kp = Kp;
-//PID_Speed.Ki = Ki;
-//PID_Speed.Kd = Kd;
+//HAL_TIM_Base_Stop_IT(&htim3);
 //
-//MOTORS_Enable();
+//PIDSpeed_Init(&PIDleft_Speed);
+//PIDSpeed_SetGain(&PIDleft_Speed, KP, KI, KD);
+//
+//
+//PIDSpeed_Init(&PIDright_Speed);
+//PIDSpeed_SetGain(&PIDright_Speed, KP, KI, KD);
+//
+//HAL_TIM_Base_Start_IT(&htim3);
 }
-void State_Enter_CONSTANT_SPEED(void)
+// Function Enter_TUNEPID_SPEED ended
 
+uint8_t readingParas2[4];
+void State_Enter_TUNEPID_POSITION(void)
 {
 	button_pushed = false;
-	//MOTORS_Disable();
-
-//	button_pushed = false;
-//
-//
-//	MOTORS_Enable();
-
-
+	HAL_UART_Transmit_IT(&huart6, "POSITION TUNING STATE", 21);
+	HAL_UART_Receive_IT(&huart6, readingParas1, 4);
 }
 
+/*
+ *
+ *
+ *
+ *
+ *
+ * InState Functions
+ *
+ *
+ *
+ *
+ */
 
 void State_InState_RESET(void)
 {
@@ -176,31 +219,19 @@ void State_InState_IDLE(void)
 
 }
 
-void State_InState_TUNE(void)
+void State_InState_LINE_FOLLOWER(void)
 {
 
-//	if (KpLeft != PIDleft_Speed.Kp || KiLeft != PIDleft_Speed.Ki || KdLeft != PIDleft_Speed.Kd) {
-//
-//		HAL_TIM_Base_Stop_IT(&htim3);
-//
-//		MOTOR_LEFT_SetPWM(0);
-//		PIDController_Init(&PIDleft_Speed);
-//		PIDController_SetGain(&PIDleft_Speed, KpLeft, KiLeft, KdLeft);
-//
-//		HAL_TIM_Base_Start_IT(&htim3);
-// }
-//
-//	if (KpRight != PIDright_Speed.Kp || KiRight != PIDright_Speed.Ki || KdRight != PIDright_Speed.Kd) {
-//
-//		HAL_TIM_Base_Stop_IT(&htim3);
-//
-//
-//		MOTOR_RIGHT_SetPWM(0);
-//		PIDController_Init(&PIDright_Speed);
-//
-//		PIDController_SetGain(&PIDright_Speed, KpRight, KiRight, KdRight);
-//		HAL_TIM_Base_Start_IT(&htim3);
-// }
+}
+
+void State_InState_TUNEPID_SPEED(void)
+{
+
+}
+
+
+void State_InState_TUNEPID_POSOITION(void)
+{
 
 }
 
@@ -208,36 +239,23 @@ void State_InState_TUNE(void)
 
 
 
-void State_InState_CONSTANT_SPEED(void) {
 
-
-}
-
+/*
+ *
+ *
+ *
+ *
+ *
+ * State Exit Functions
+ *
+ *
+ *
+ *
+ */
 
 void State_Exit_RESET(void)
 {
-	HAL_TIM_Base_Stop_IT(&htim3);
-	resetEncoder();
-	resetFilter();
-
-	PIDSpeed_Init(&PIDleft_Speed);
-	PIDSpeed_Init(&PIDright_Speed);
-
-
-	KpLeft = 0;
-	KiLeft = 0;
-	KdLeft = 0;
-
-	KpRight = 0;
-	KiRight = 0;
-	KdRight = 0;
-
-	LEFT = 0;
-	RIGHT = 0;
-
-
-	MOTORS_Reset();
-	HAL_TIM_Base_Start_IT(&htim3);
+	reset_complete = true;
 }
 
 void State_Exit_IDLE(void)
@@ -245,16 +263,23 @@ void State_Exit_IDLE(void)
 	MOTORS_Enable();
 }
 
-void State_Exit_TUNE(void)
+void State_Exit_LINE_FOLLOWER(void)
+{
+	HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, 0);
+}
+
+void State_Exit_TUNEPID_SPEED(void)
 {
 
-	HAL_GPIO_WritePin(GPIOA, LD2_Pin, 0);
 
 }
 
-void State_Exit_CONSTANT_SPEED(void)
+void State_Exit_TUNEPID_POSOITION(void)
 {
+
 }
+
+
 
 
 

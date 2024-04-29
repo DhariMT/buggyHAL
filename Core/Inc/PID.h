@@ -24,7 +24,11 @@ typedef struct {
 
 } PID_Type1;
 
-
+/* 		declaring speed controllers methods		*/
+void  PIDSpeed_Init(PID_Type1 *pid);
+void  PIDSpeed_SetGain(PID_Type1 *pid, double Kp, double Ki, double Kd);
+void  PIDSpeed_SetLimits(PID_Type1 *pid, int16_t outputMin, int16_t outputMax);
+int16_t  PIDSpeed_Update(PID_Type1 *pid, int16_t setpoint, int16_t input);
 
 
 
@@ -36,20 +40,9 @@ typedef struct {
 
 }PID_Type2;
 
-
-
-
-
-
-
-
-/* 		declaring both controllers methods		*/
+/* 		declaring position controllers methods		*/
 void PIDPosition_Init(PID_Type2 *pid, double _Kp);
 int16_t PIDPosition_Update(PID_Type2 *pid, int16_t setpoint, int16_t input);
 
-void  PIDSpeed_Init(PID_Type1 *pid);
-void  PIDSpeed_SetGain(PID_Type1 *pid, double Kp, double Ki, double Kd);
-void  PIDSpeed_SetLimits(PID_Type1 *pid, int16_t outputMin, int16_t outputMax);
-int16_t  PIDSpeed_Update(PID_Type1 *pid, int16_t setpoint, int16_t input);
 
 #endif

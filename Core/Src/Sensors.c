@@ -6,6 +6,7 @@
  */
 #define MAX_SENSOR 4095
 #define SENSORS_NUM 5
+#define THRESHOLD 700
 #include "Sensors.h"
 
 uint16_t uncalibratedSensor[SENSORS_NUM];
@@ -20,13 +21,18 @@ void stopSensors() {
 }
 
 uint16_t linePosition() {
-	uint16_t sensorSum = 0;
-	uint16_t sensorWeightedSum = 0;
+	uint16_t maxSens = mySensor[0];
+	uint16_t minSens = mySensor[0];
 	for (uint8_t sensorNumber = 0; sensorNumber < SENSORS_NUM; sensorNumber++) {
-		sensorSum += mySensor[sensorNumber];
-		sensorWeightedSum += (mySensor[SENSORS_NUM - sensorNumber] - mySensor[sensorNumber]);
+			if (mySensor[sensorNumber] > maxSens) {
+				maxSens = mySensor[sensorNumber];
+			}
+			elseif (mySensor[sensorNumber] < minSens) {
+				minSens = mySensor[sensorNumber];
+			}
 	}
-	return sensorSum/5;
+
+	return;
 }
 
 //void removeSensorsAmbiance(uint16_t *mySensor) {
@@ -39,8 +45,4 @@ uint16_t linePosition() {
 //
 //}
 
-//void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc) {
-//// empty for now
-//
-//}
 

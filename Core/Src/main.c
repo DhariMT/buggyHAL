@@ -119,6 +119,7 @@ int main(void)
   MX_ADC1_Init();
   MX_TIM3_Init();
   MX_USART6_UART_Init();
+  MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
 
   MOTORS_Reset();
@@ -138,13 +139,13 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  HAL_UART_Receive(&huart6, bleChar, 1, 100);
-	  if (bleChar == 'A') {
-	  		HAL_GPIO_WritePin(GPIOA, LD2_Pin, 1);
-	  	}-
-	  	else if (bleChar == 'C') {
-	  		HAL_GPIO_WritePin(GPIOA, LD2_Pin, 0);
-	  	}
+//	  HAL_UART_Receive(&huart6, bleChar, 1, 100);
+//	  if (bleChar == 'A') {
+//	  		HAL_GPIO_WritePin(GPIOA, LD2_Pin, 1);
+//	  	}-
+//	  	else if (bleChar == 'C') {
+//	  		HAL_GPIO_WritePin(GPIOA, LD2_Pin, 0);
+//	  	}
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
