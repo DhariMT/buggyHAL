@@ -5,7 +5,14 @@
 #endif
 
 
-void PIDController_Init(PIDController *pid) {
+#define INTEGRATOR_MAX 2000000
+#define ADC_MAX 4095
+#define POSITION_SAMPLE_TIME 0.1 // sec
+#define SPEED_SAMPLE_TIME 0.01 // sec
+
+
+
+void PIDSpeed_Init(PID_Type1 *pid) {
 
 	/* Clear controller variables */
 
@@ -16,21 +23,16 @@ void PIDController_Init(PIDController *pid) {
 	pid->Ki = 0;
 	pid->Kd = 0;
 
-	pid->limMax = MAX_PWM;
-	pid->limMin = -MAX_PWM;
-	pid->limMinInt = -MAX_PWM;
-	pid->limMaxInt = MAX_PWM;
 
-	pid->lastTime = HAL_GetTick();
+//	pid->lastTime = HAL_GetTick();
 	pid->prevInput = 0;
 	pid->prevError = 0;
 
 
-	pid->T = 0.01f;
 	pid->out = 0.0;
 }
 
-void  PIDController_SetGain(PIDController *pid, double Kp, double Ki, double Kd) {
+void  PIDSpeed_SetGain(PID_Type1 *pid, double Kp, double Ki, double Kd) {
 
 	pid->Kp = Kp;
 	pid->Ki = Ki;
@@ -39,36 +41,27 @@ void  PIDController_SetGain(PIDController *pid, double Kp, double Ki, double Kd)
 }
 
 
-void  PIDController_SetLimits(PIDController *pid, int16_t outputMax, int16_t outputMin, int16_t IntegralMax , int16_t IntegralMin){
+//void  PIDSpeed_SetLimits(PID_Type1 *pid, int16_t outputMax, int16_t outputMin, int16_t IntegralMax , int16_t IntegralMin){
+//
+//	pid->limMin = outputMin;
+//	pid->limMax = outputMax;
+//
+//}
 
-	pid->limMin = outputMin;
-	pid->limMax = outputMax;
+int16_t PIDSpeed_Update(PID_Type1 *pid, int16_t setpoint, int16_t input) {
 
-	pid->limMaxInt = IntegralMax;
-	pid->limMinInt= IntegralMin;
 
-}
-
-int16_t PIDController_Update(PIDController *pid, int16_t setpoint, int16_t input) {
-
-	/*
-	* Error signal
-	*/
 	int16_t error = setpoint - input;
 
 
-	/*
-	* Proportional
-	*/
+
     double proportional = pid->Kp * error;
 
 
-	/*
-	* Integral
-	*/
+
     pid->integratorError += (error);
 
-	// Limit integration error to avoid system saturation
+	// Limit integration part to avoid system saturation // anti-wind coupling
     if (pid->integratorError > INTEGRATOR_MAX) {
 
     	pid->integratorError = INTEGRATOR_MAX;
@@ -79,32 +72,46 @@ int16_t PIDController_Update(PIDController *pid, int16_t setpoint, int16_t input
 
     }
 
-    double integrator =  pid->Ki * pid->T * pid->integratorError;
+    double integrator =  pid->Ki * SPEED_SAMPLE_TIME * pid->integratorError;
 
 
 
 
-    pid->differentiator = (  pid->Kd * (error - pid->prevError)	) / (pid->T);
+    pid->differentiator = (  pid->Kd * (error - pid->prevError)	) / SPEED_SAMPLE_TIME;
 
 
     pid->out = (int16_t)(proportional + integrator + pid->differentiator);
 
-    if (pid->out > pid->limMax) {
+    if (pid->out > MAX_PWM) {
 
-        pid->out = pid->limMax;
+        pid->out = MAX_PWM;
 
-    } else if (pid->out < pid->limMin) {
+    } else if (pid->out < -MAX_PWM) {
 
-        pid->out = pid->limMin;
+        pid->out = -MAX_PWM;
 
     }
 
-	/* Store measurement for later use */
+	// Store measurement for integral and derivative action
     pid->prevInput = input;
     pid->prevError = error;
-	/* Store last time for state machine use */
-    pid->lastTime = HAL_GetTick();
+	// Store time stamp for state machine use
+    //pid->lastTime = HAL_GetTick();
 
-    // return PID output
+
     return pid->out;
 }
+
+void PIDPosition_Init(PID_Type2 *pid, double _Kp) {
+
+	pid->Kp = _Kp;
+
+}
+int16_t PIDPosition_Update(PID_Type2 *pid, int16_t setpoint, int16_t input) {
+
+	int16_t error = setpoint - input;
+
+    pid->out = pid->Kp * error;
+    return pid->out;
+}
+

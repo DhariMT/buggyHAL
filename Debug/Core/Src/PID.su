@@ -1,3 +1,5 @@
-../Core/Src/PID.c:13:6:PIDSpeed_Init	16	static
-../Core/Src/PID.c:34:7:PIDSpeed_SetGain	40	static
-../Core/Src/PID.c:53:9:PIDSpeed_Update	48	static
+../Core/Src/PID.c:15:6:PIDSpeed_Init	16	static
+../Core/Src/PID.c:35:7:PIDSpeed_SetGain	40	static
+../Core/Src/PID.c:51:9:PIDSpeed_Update	48	static
+../Core/Src/PID.c:105:6:PIDPosition_Init	24	static
+../Core/Src/PID.c:110:9:PIDPosition_Update	32	static

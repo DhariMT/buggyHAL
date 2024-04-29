@@ -1,0 +1,3 @@
+../Core/Src/Sensors.c:14:6:startSensors	8	static
+../Core/Src/Sensors.c:18:6:stopSensors	8	static
+../Core/Src/Sensors.c:22:10:linePosition	16	static

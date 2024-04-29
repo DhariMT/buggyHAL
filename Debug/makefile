@@ -60,8 +60,8 @@ all: main-build
 main-build: buggy_Using_HAL.elf secondary-outputs
 
 # Tool invocations
-buggy_Using_HAL.elf buggy_Using_HAL.map: $(OBJS) $(USER_OBJS) C:\Users\dhari\Documents\GitHub\buggyHAL\STM32F401RETX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "buggy_Using_HAL.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\dhari\Documents\GitHub\buggyHAL\STM32F401RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="buggy_Using_HAL.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+buggy_Using_HAL.elf buggy_Using_HAL.map: $(OBJS) $(USER_OBJS) C:\Users\dhari\buggyUsingHAL\STM32F401RETX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "buggy_Using_HAL.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\dhari\buggyUsingHAL\STM32F401RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="buggy_Using_HAL.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

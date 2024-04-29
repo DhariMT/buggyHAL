@@ -13,10 +13,11 @@
 
 
 
-
+/*
+ * Defining an enum that contains all states in the order they are placed in the LUT (Look Up table).
+ */
 typedef enum {RESET_StateMachine = 0 , IDLE = 1, TUNE = 2, CONSTANT_SPEED = 3 } states;
-
-states StateMachine(states Current_State);
+states StateMachine(states Current_State); // declare state machine function which will contain or organize the main body of this program
 
 typedef void (* const voidFunc)(void);
 

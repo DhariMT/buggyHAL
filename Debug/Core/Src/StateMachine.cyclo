@@ -1,0 +1,15 @@
+../Core/Src/StateMachine.c:39:8:StateMachine	9
+../Core/Src/StateMachine.c:97:6:State_Enter_RESET	1
+../Core/Src/StateMachine.c:103:6:State_Enter_IDLE	1
+../Core/Src/StateMachine.c:109:6:State_Enter_TUNE	1
+../Core/Src/StateMachine.c:136:6:State_Enter_CONSTANT_SPEED	1
+../Core/Src/StateMachine.c:151:6:State_InState_RESET	1
+../Core/Src/StateMachine.c:156:6:State_InState_IDLE	1
+../Core/Src/StateMachine.c:161:6:State_InState_TUNE	1
+../Core/Src/StateMachine.c:193:6:State_InState_CONSTANT_SPEED	1
+../Core/Src/StateMachine.c:199:6:State_Exit_RESET	1
+../Core/Src/StateMachine.c:225:6:State_Exit_IDLE	1
+../Core/Src/StateMachine.c:230:6:State_Exit_TUNE	1
+../Core/Src/StateMachine.c:237:6:State_Exit_CONSTANT_SPEED	1
+../Core/Src/StateMachine.c:245:6:HAL_GPIO_EXTI_Callback	2
+../Core/Src/StateMachine.c:258:6:HAL_TIM_PeriodElapsedCallback	1

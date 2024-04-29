@@ -4,19 +4,13 @@
 
 #define INTEGRATOR_MAX 2000000
 
+/* 		Speed controller		*/
 typedef struct {
 
 	/* Controller gains */
 	double Kp;
 	double Ki;
 	double Kd;
-
-//	/* Output limits */
-//	int16_t limMin;
-//	int16_t limMax;
-
-	/* Sample time (in seconds) */
-	double T;
 
 	/* Controller "memory" */
 	double integratorError;
@@ -24,46 +18,34 @@ typedef struct {
 	int16_t prevInput;
 	int16_t prevError;
 
-	uint8_t lastTime;
 
 	/* Controller output */
 	int16_t out;
 
 } PID_Type1;
 
+
+
+
+
+/* 		Line Position simple Proportional controller		*/
 typedef struct {
 
-	/* Controller gains */
 	double Kp;
-	double Ki;
-	double Kd;
-
-	/* Controller parameters */
-	uint8_t N;
-
-	/*    */
-	double a0;
-	double a1;
-	double a2;
-	/*    */
-	double b0;
-	double b1;
-	double b2;
-	/*    */
-	double ku1;
-
-	/* Sample time (in seconds) */
-	double T;
-
-	/* Controller "memory" */
-
-
-
-	/* Controller output */
 	int16_t out;
 
-} PID_Type2;
+}PID_Type2;
 
+
+
+
+
+
+
+
+/* 		declaring both controllers methods		*/
+void PIDPosition_Init(PID_Type2 *pid, double _Kp);
+int16_t PIDPosition_Update(PID_Type2 *pid, int16_t setpoint, int16_t input);
 
 void  PIDSpeed_Init(PID_Type1 *pid);
 void  PIDSpeed_SetGain(PID_Type1 *pid, double Kp, double Ki, double Kd);

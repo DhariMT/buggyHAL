@@ -61,8 +61,8 @@
 
 // Flags for state machine
 
-
-
+uint16_t ADCREAD[5];
+char bleChar;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -117,18 +117,34 @@ int main(void)
   MX_TIM1_Init();
   MX_TIM2_Init();
   MX_ADC1_Init();
-  MX_USART2_UART_Init();
   MX_TIM3_Init();
+  MX_USART6_UART_Init();
   /* USER CODE BEGIN 2 */
 
   MOTORS_Reset();
-  MOTORS_Enable();
+  MOTORS_Disable();
+
+//  HAL_ADC_Start_DMA(&hadc1,ADCREAD, 5);
+
+//  HAL_GPIO_TogglePin(Darl1_GPIO_Port, Darl1_Pin);
+//  HAL_GPIO_TogglePin(Darl2_GPIO_Port, Darl2_Pin);
+//  HAL_GPIO_TogglePin(Darl3_GPIO_Port, Darl3_Pin);
+//  HAL_GPIO_TogglePin(Darl4_GPIO_Port, Darl4_Pin);
+//  HAL_GPIO_TogglePin(Darl5_GPIO_Port, Darl5_Pin);
+  //HAL_UART_Receive_IT(&huart2, bleChar, 1);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  HAL_UART_Receive(&huart6, bleChar, 1, 100);
+	  if (bleChar == 'A') {
+	  		HAL_GPIO_WritePin(GPIOA, LD2_Pin, 1);
+	  	}-
+	  	else if (bleChar == 'C') {
+	  		HAL_GPIO_WritePin(GPIOA, LD2_Pin, 0);
+	  	}
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -188,6 +204,20 @@ void SystemClock_Config(void)
 //// empty for now
 //
 //}
+
+//void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+//{
+//	if (bleChar == 'A') {
+//		HAL_GPIO_WritePin(GPIOA, LD2_Pin, 1);
+//	}
+//	else if (bleChar == 'C') {
+//		HAL_GPIO_WritePin(GPIOA, LD2_Pin, 0);
+//	}
+//	HAL_UART_Receive_IT(&huart2, bleChar, 1);
+//
+//}
+
+
 /* USER CODE END 4 */
 
 /**

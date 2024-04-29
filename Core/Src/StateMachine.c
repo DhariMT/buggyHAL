@@ -15,8 +15,11 @@
 #define SAMPLE_TIME 10 //milliseconds
 /*
  * flags are of type uint8_t
- * List of all flags is:
+ * List of all flags is as follows :
  *
+ * ble_message
+ * speed_sampled
+ * button_pushed
  *
  */
 
@@ -24,34 +27,48 @@ voidFunc UponEnter[S_NUM] =   {State_Enter_RESET, State_Enter_IDLE,  State_Enter
 voidFunc ActionWhileInState[S_NUM] = {State_InState_RESET, State_InState_IDLE, State_InState_TUNE, State_InState_CONSTANT_SPEED};
 voidFunc  UponExit[S_NUM] =           {State_Exit_RESET,  State_Exit_IDLE, State_Exit_TUNE , State_Exit_CONSTANT_SPEED};
 
-states button_pushed, speed_sampled;
+
+
+typedef enum {
+	STOP,
+	PID1_TUNE,
+	PID2_TUNE,
+	PRINT_SPEED,
+	PRINT_POSITION
+} ble;
+/*                Events            */
+uint8_t button_pushed, speed_sampled, reset_complete;
+ble ble_state;
+
+
 
 double KpLeft, KiLeft, KdLeft, KpRight, KiRight, KdRight;
 
 int16_t LEFT, RIGHT;
 
-
-
+PID_Type1 PIDleft_Speed;
+PID_Type1 PIDright_Speed;
+//uint16_t* mySensor;
 
 
 
 states StateMachine(states Current_State)
 {
-	static states Next_State = Current_State;
+	states Next_State = Current_State;
 
     /*
-     * Main variables, declared as
+     * Main variables, declared as static
      */
-    static PID_Type1 PIDleft_Speed
-	static PID_Type1 PIDright_Speed;
-    static uint16_t * mySensor;
+
     switch ( Current_State )
     {
 
     	/* State IDLE START */
 
     case RESET_StateMachine:
+    	if (reset_complete == true) {
     	Next_State = IDLE;
+    	}
     	break;
     case IDLE:
     	if (button_pushed) {
@@ -151,12 +168,12 @@ void State_Enter_CONSTANT_SPEED(void)
 
 void State_InState_RESET(void)
 {
-	//HAL_Delay(1);
+
 }
 
 void State_InState_IDLE(void)
 {
-	//HAL_Delay(1);
+
 }
 
 void State_InState_TUNE(void)
@@ -252,6 +269,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 	}
 
 }
+
 
 
 
