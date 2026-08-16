@@ -1,7 +1,0 @@
-../Core/Src/StateMachine.c:118:6:State_InState_IDLE	0	static
-../Core/Src/StateMachine.c:84:6:State_Enter_IDLE	0	static
-../Core/Src/StateMachine.c:90:6:State_Enter_CONSTANT_SPEED	24	static
-../Core/Src/StateMachine.c:123:6:State_InState_CONSTANT_SPEED	8	static
-../Core/Src/StateMachine.c:135:6:State_Exit_IDLE	0	static
-../Core/Src/StateMachine.c:140:6:State_Exit_CONSTANT_SPEED	0	static
-../Core/Src/StateMachine.c:33:8:StateMachine	8	static

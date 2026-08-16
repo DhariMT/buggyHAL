@@ -1,4 +1,0 @@
-../Core/Src/Encoder.c:15:6:resetFilter	2
-../Core/Src/Encoder.c:33:6:computeFilter	3
-../Core/Src/Encoder.c:46:6:resetEncoder	1
-../Core/Src/Encoder.c:58:6:updateEncoder	1

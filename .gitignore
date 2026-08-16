@@ -1,0 +1,28 @@
+# ---- STM32CubeIDE / Eclipse build output ----
+Debug/
+Release/
+*.o
+*.d
+*.su
+*.elf
+*.bin
+*.hex
+*.list
+*.map
+*.cyclo
+
+# ---- STM32CubeMX / CubeIDE backup artifacts ----
+Backup/
+*.bak
+*.old
+*~
+
+# ---- Eclipse workspace-local state ----
+.metadata/
+RemoteSystemsTempFiles/
+*.launch.bak
+
+# ---- OS cruft ----
+.DS_Store
+Thumbs.db
+desktop.ini
