@@ -166,14 +166,31 @@ buggyHAL/
 └── STM32F401RETX_RAM.ld            # Linker script (execute from RAM)
 ```
 
-<!--
-  Adding photos of the buggy makes a big difference on a portfolio repo.
-  Drop 1-2 images into docs/ and uncomment a block like this under Overview:
+## Gallery
 
-  ## Gallery
-  ![The assembled buggy](docs/buggy.jpg)
-  ![Track test run](docs/track-run.jpg)
--->
+![Line-sensor front end hand-wired on perfboard](docs/line-sensor-prototype-veroboard.jpg)
+
+*First cut of the line-sensor front end, hand-wired on perfboard — DIP sockets for the reflective
+optopairs, a resistor pair per channel, point-to-point links, and polarised connectors for the
+supply and analogue returns.*
+
+![Fabricated line-sensor PCB, populated](docs/line-sensor-pcb-populated.jpg)
+
+*The same front end respun as a fabricated board: sockets `S1`–`S4` for the optopairs, `R1`–`R8`
+setting emitter and detector bias, a 16-pin driver at `U1`, and header `P2` carrying the analogue
+channels back to the NUCLEO.*
+
+![The assembled buggy driving across a tiled floor](docs/buggy-assembled-ground-run.jpg)
+
+*The assembled buggy mid-run — controller and driver boards stacked over the drive axle on an
+acrylic chassis, battery pack behind, and a toggle kill-switch on a flying lead. No sensor board is
+fitted to the underside; the line-sensor hardware above never made it onto the finished vehicle.*
+
+**▶ [Ground run — 13 s, no audio](docs/buggy-ground-run.mp4)**
+
+*Closed-loop wheel-speed control in the `TUNE` state: the buggy holds a commanded velocity from
+encoder feedback and tracks straight across an unmarked floor. There is no line and no steering
+controller — see [Project Status](#project-status) for what that does and doesn't demonstrate.*
 
 ---
 
